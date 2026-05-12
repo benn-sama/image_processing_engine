@@ -9,7 +9,7 @@
 */
 
 
-WorkerThread::WorkerThread(uint16_t id) {
+Thread::Thread(uint16_t id) {
     this->id = id;
 }
 
@@ -21,13 +21,23 @@ WorkerThread::WorkerThread(uint16_t id) {
    This method allows the thread to simulate "work"
 */
 
-void WorkerThread::doWork() {
+void Thread::doWork(auto& sem) {
     using namespace std::literals::chrono_literals;
-    std::cout << id << ": wokeup\n";
-    std::cout << id << ": working...\n";
-    std::this_thread::sleep_for(5s);
-    std::cout << id << ": done!\n";
-    std::cout << id << ": going back to sleep.\n";
+
+    while (true) {
+      // -- SEMAPHORE: acquires here, waits until signaled
+      sem.acquire();
+
+      std::cout << id << ": wokeup\n";
+      std::cout << id << ": working...\n";
+      std::this_thread::sleep_for(5s);
+      std::cout << id << ": done!\n";
+      std::cout << id << ": going back to sleep.\n";
+      
+      // -- SEMAPHORE: release lock here --
+      sem.release();
+
+    }
 }
 
 /*
@@ -37,24 +47,8 @@ void WorkerThread::doWork() {
  Desc:
    Returns this objects id
 */
-
-uint16_t WorkerThread::getID() {
+uint16_t Thread::getID() {
     return id;
-}
-
-/*
- Method: 
-   work(WorkerThread *thread)
-
- Desc:
-   This isntance allows the thread to simulate work
-*/
-
-void WorkerThread::work(WorkerThread *thread) {
-    while(true) 
-    {
-        this->doWork();
-    }
 }
 
 /*
@@ -62,9 +56,32 @@ void WorkerThread::work(WorkerThread *thread) {
    run()
 
  Desc:
-   Creates thread and pass this instance as the parameter
+   Creates instance of thread and pass this instance as the parameter
 */
+void Thread::run(auto& sem) {
+    _thread = new std::thread(workerThread, this, sem);
+}
 
-void WorkerThread::run() {
-    _thread = new std::thread(work, this);
+/*
+ Method: 
+   workerThread(Thread* thread)
+
+ Desc:
+   This calls the do work function
+*/
+void Thread::workerThread(Thread* aThread, auto& sem) {
+  aThread->doWork(sem);
+}
+
+/*
+ Method:
+  wait()
+
+ Desc:
+  This method calls the main process to wait until this thread is terminated
+*/
+void Thread::wait() {
+  if (_thread != NULL) {
+    _thread->join();
+  }
 }

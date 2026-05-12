@@ -4,18 +4,20 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <semaphore>
 
-class WorkerThread {
+class Thread {
     private: 
-        uint16_t id;                     // id of the thread
-        std::thread* _thread;            // the workerthread
+        uint16_t id;                                // id of the thread
+        std::thread* _thread;                       // the workerthread
+        static void workerThread(Thread* aThread, auto& sem);  // method for the actual working thread
     
     public:
-        WorkerThread(uint16_t id);       // default constructor
-        void doWork();                   // simulates thread working
-        uint16_t getID();                // returns id
-        void work(WorkerThread *thread); // the actual worker thread
-        void run();                      // creates the thread
+        Thread(uint16_t id);                        // default constructor
+        void doWork(auto& sem);                              // simulates thread working
+        uint16_t getID();                           // returns id
+        void run(auto& sem);                                 // creates the thread
+        void wait();
 };
 
 #endif
