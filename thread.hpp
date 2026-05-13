@@ -14,9 +14,9 @@ class Thread {
     
     public:
         Thread(uint16_t id);                        // default constructor
-        void doWork(auto& sem);                              // simulates thread working
+        void doWork(auto& sem);                     // simulates thread working
         uint16_t getID();                           // returns id
-        void run(auto& sem);                                 // creates the thread
+        void run(auto& sem);                        // creates the thread
         void wait();
 };
 
