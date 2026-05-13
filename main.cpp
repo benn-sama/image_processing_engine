@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <random>
+#include <mutex>
 
 // returns a random number
 int randomNum() {
@@ -20,49 +21,48 @@ bool correctNumber() {
     return random() <= 7;
 }
 
-std::counting_semaphore<SLOTS> sem(0); // initialized only one
+int total_working = 0;
 
 int main() {
     std::vector<Thread*> pool;
-    const short THREAD_COUNT = 5;
+    const short THREAD_COUNT = 10;
     int count = 0;
 
-    try {
-        std::cout << "Intializing a threadpool\n";
-        // create thread pool
-        for (int i = 0; i < THREAD_COUNT; ++i) {
-            pool.push_back(new Thread(i));
-        }
-        std::cout << "Threadpool initialized.\n";
 
-        std::cout << "Starting threads\n";
-        // start up thread
-        for (const auto& thread : pool) {
-            thread->run(sem);
-        }
-        std::cout << "All threads have started.\n";
+    std::mutex mutex;            // for locking
+    std::condition_variable cv;  // for signaling
+    int ready = 0;               // conditon check just in case
 
-        // std::cout << "Joining threads\n";
-        // // wait for all the threads
-        // for (const auto& thread: pool) {
-        //     thread->wait();
-        // }
-        // std::cout << "Threads have joined.\n";
-    } catch (std::invalid_argument& e) {
-        std::cout << "ERROR: DURING THREAD START\n" << e.what() << std::endl;
-        return 1;
+    // create thread pool
+    std::cout << "Intializing a threadpool\n";
+    for (int i = 0; i < THREAD_COUNT; ++i) {
+        pool.push_back(new Thread(i));
     }
+    std::cout << "Threadpool initialized.\n";
 
-    try {
-        while (true) {
-            // allows a thread to run
-            while (correctNumber()) {
-                ++count;
-                std::cout << count << " : Thread signaled" << std::endl;
-                sem.release();
+    // start up thread
+    std::cout << "Starting threads\n";
+    for (const auto& thread : pool) {
+        thread->run(mutex, cv, ready);
+    }
+    std::cout << "All threads have started.\n";
+
+    while (true) {
+        // allows a thread to run
+        while (correctNumber()) {
+            std::unique_lock<std::mutex> lk(mutex);
+            if (total_working < 5) {
+                ++count; 
+                std::cout << count << ": Signaling Thread" << std::endl;
+
+                ready = 1;
+                lk.unlock();
+
+                cv.notify_one();
+                std::cout << count << ": Thread signaled" << std::endl;
+            } else {
+                std::cout << "-----------Queue is full. Waiting for an open spot.-----------";
             }
         }
-    } catch (std::invalid_argument& e) {
-        std::cout << "ERROR: DURING THREAD WORK\n" << e.what() << std::endl;
     }
 }
