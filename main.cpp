@@ -56,11 +56,10 @@ int main() {
     try {
         while (true) {
             // allows a thread to run
-            while (true) {
+            while (correctNumber()) {
                 ++count;
                 std::cout << count << " : Thread signaled" << std::endl;
                 sem.release();
-                sem.acquire(); // HERE
             }
         }
     } catch (std::invalid_argument& e) {
