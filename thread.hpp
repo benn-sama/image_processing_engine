@@ -2,16 +2,14 @@
 #define THREAD_HPP
 
 #include <condition_variable>
-#include <cstdint>
 #include <memory>
 #include <sys/types.h>
 #include <thread>
 #include <chrono>
 #include <iostream>
-#include <semaphore>
-#include <random>
 
-#define SLOTS 5 // num of allowed thread to work concurrently
+#include "random_num_gen.cpp"
+
 extern int total_working;       // in main thread: if 5 threads are working, wait for at LEAST 1 to finish
 
 class Thread {
@@ -28,17 +26,6 @@ class Thread {
         uint16_t getID();                                   // returns id
         void run(std::mutex& mutex, std::condition_variable& cv, int& ready);      // creates the thread
         void wait();
-};
-
-// returns a random number from to min-to-max
-struct RandomNum {
-    std::random_device dev;
-    std::mt19937 rng{dev()};
-    
-    int getRandomNum(int min, int max) {
-        std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-        return dist(rng);
-    }
 };
 
 #endif

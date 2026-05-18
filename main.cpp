@@ -1,60 +1,12 @@
-#include "thread.hpp"
+#include "thread_pool.hpp"
 
-#include <cstdlib>
-#include <semaphore>
-#include <stdexcept>
-#include <vector>
-#include <random>
-#include <mutex>
-#include <vector>
+int main(int argc, char*argv[]) {
+    int threadCount = 5;
 
-// 70% probablity of being right
-bool correctNumber() {
-    RandomNum random;
-    return random.getRandomNum(1, 10) <= 7;
-}
-
-int total_working = 0;
-
-int main() {
-    std::vector<Thread*> pool;
-    const short THREAD_COUNT = 10;
-    int count = 0;
-    std::vector<int> queue;
-
-    std::mutex mutex;            // for locking
-    std::condition_variable cv;  // for signaling
-    int ready = 0;               // conditon check just in case
-
-    // create thread pool
-    std::cout << "Intializing a threadpool\n";
-    for (int i = 0; i < THREAD_COUNT; ++i) {
-        pool.push_back(new Thread(i));
+    if (argc > 1) {
+        threadCount = std::atoi(argv[1]);
     }
-    std::cout << "Threadpool initialized.\n";
 
-    // start up thread
-    std::cout << "Starting threads\n";
-    for (const auto& thread : pool) {
-        thread->run(mutex, cv, ready);
-    }
-    std::cout << "All threads have started.\n";
-
-    while (true) {
-        // allows a thread to run
-        while (correctNumber()) {
-            std::unique_lock<std::mutex> lk(mutex);
-            if (total_working < 5) {
-                ++count;
-                ++total_working; 
-                std::cout << count << ": Signaling Thread" << std::endl;
-
-                ready = 1;
-                lk.unlock();
-
-                cv.notify_one();
-                std::cout << count << ": Thread signaled" << std::endl;
-            }
-        }
-    }
+    ThreadPool pool(threadCount);
+    pool.run();
 }

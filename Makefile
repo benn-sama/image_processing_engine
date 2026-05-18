@@ -1,7 +1,7 @@
 CXX := g++
 CXXFLAGS := -std=c++20 -Wall -Wextra -O2
 
-SRC := main.cpp thread.cpp
+SRC := main.cpp thread.cpp thread_pool.cpp random_num_gen.cpp
 OBJ := $(SRC:.cpp=.o)
 TARGET := main
 
@@ -12,7 +12,7 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-%.o: %.cpp thread.hpp
+%.o: %.cpp thread.hpp thread_pool.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run-main: $(TARGET)
