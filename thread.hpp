@@ -14,18 +14,18 @@ extern int total_working;       // in main thread: if 5 threads are working, wai
 
 class Thread {
     private: 
-        uint16_t id;                                        // id of the thread
+        uint16_t                     id;                    // id of the thread
         std::unique_ptr<std::thread> _thread;               // the workerthread
         
         // method for the actual working thread
         static void workerThread(Thread* aThread, std::mutex& mutex, std::condition_variable& cv, int& ready);
     
     public:
-        Thread(uint16_t id);                                // default constructor
-        void doWork(std::mutex& mutex, std::condition_variable& cv, int& ready);   // simulates thread working
-        uint16_t getID();                                   // returns id
-        void run(std::mutex& mutex, std::condition_variable& cv, int& ready);      // creates the thread
-        void wait();
+        Thread(uint16_t id);                                                          // default constructor
+        void     doWork(std::mutex& mutex, std::condition_variable& cv, int& ready);  // simulates thread working
+        uint16_t getID();                                                             // returns id
+        void     run(std::mutex& mutex, std::condition_variable& cv, int& ready);     // creates the thread
+        void     wait();
 };
 
 #endif
