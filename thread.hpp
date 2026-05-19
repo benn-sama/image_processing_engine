@@ -10,7 +10,7 @@
 
 #include "random_num_gen.cpp"
 
-extern int total_working;       // in main thread: if 5 threads are working, wait for at LEAST 1 to finish
+extern int total_working;       // in main thread: if n threads are working, wait for at LEAST 1 to finish
 
 class Thread {
     private: 
