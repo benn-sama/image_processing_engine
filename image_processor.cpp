@@ -115,6 +115,8 @@ void Image::clone() {
     std::vector<char> cloneBuffer(srcSize);
     _src->read(cloneBuffer.data(), srcSize);
     _dst->write(cloneBuffer.data(), srcSize);
+    
+    _dst->seekg(_offset, std::ios::beg);
 }
 
 void Image::greyscale(char &fmethod) {
@@ -151,6 +153,7 @@ void Image::greyscale(char &fmethod) {
 
     std::unique_ptr buffer = std::make_unique<char[]>(3);
     while (_dst->read(buffer.get(), 3)) {
+        int count = 0;
         int red   = (unsigned char)buffer[0];
         int green = (unsigned char)buffer[1];
         int blue  = (unsigned char)buffer[2];
@@ -176,5 +179,8 @@ void Image::greyscale(char &fmethod) {
         for (int i = 0; i < 3; ++i) {
             _dst->put(grey);
         }
+
+        // ++count;
+        // std::cout << "count: " << count << std::endl;
     }
 }

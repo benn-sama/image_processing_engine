@@ -17,7 +17,7 @@ class ThreadPool{
         int                     ready = 0;         // prevent spurious wakeups
 
         std::vector <int>       queue;             // task queue
-        void                    startThreads();                       // starts the threads
+        void                    startThreads();    // starts the threads
     public:
         ThreadPool(short threadCount);             // constructor that initializes the number of threads
         void run();                                // threads start running here
