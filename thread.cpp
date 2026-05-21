@@ -85,7 +85,6 @@ void Thread::run(std::mutex& mutex, std::condition_variable& cv, int& ready) {
       std::ref(mutex), 
       std::ref(cv), 
       std::ref(ready));
-
 }
 
 /*

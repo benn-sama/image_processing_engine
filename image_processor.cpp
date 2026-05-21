@@ -44,45 +44,6 @@ long Image::ppm_header_size(const std::filesystem::path& fileName) {
     return static_cast<long>(f.tellg());
 }
 
-/*
- * Returns the luminosity function for greyscaling images
- * Formula: (0.2126 * R) + (0.7152 * G) + (0.0722 * B)
- */
-int Image::luminosityf(unsigned char const red, unsigned char const green, unsigned char const blue) {
-    return (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
-}
-
-/*
- * Returns the average method function for greyscaling
- * Formula: (R + G + B) / 3
- */
-int Image::avgMethodf(unsigned char const red, unsigned char const green, unsigned char const blue) {
-    return (red + green + blue) / 3;
-}
-
-/*
- * Returns the lightness function for greyscaling
- * Formula: (max(R, G, B) + min(R, G, B)) / 2
- */
-int Image::lightnessf(unsigned char const red, unsigned char const green, unsigned char const blue) {
-    std::vector<unsigned char> rgb{red, green, blue};
-    unsigned char min = red;
-    unsigned char max = red;
-
-    for (auto& color : rgb) {
-        if (color < min) {
-            min = color;
-        }
-
-        if (color > max) {
-            max = color;
-        }
-    }
-
-    
-    return (max + min) / 2;
-}
-
 Image::Image() {}
 
 void Image::source(std::string &dir) {
@@ -153,7 +114,6 @@ void Image::greyscale(char &fmethod) {
 
     std::unique_ptr buffer = std::make_unique<char[]>(3);
     while (_dst->read(buffer.get(), 3)) {
-        int count = 0;
         int red   = (unsigned char)buffer[0];
         int green = (unsigned char)buffer[1];
         int blue  = (unsigned char)buffer[2];

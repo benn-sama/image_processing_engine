@@ -10,10 +10,23 @@ int main(int argc, char*argv[]) {
 
     // ThreadPool pool(threadCount);
     // pool.run();
+
+    std::string dir    = "";
+    char*       choice = nullptr;
+
+    if (argc > 1) {
+        dir    = std::string(argv[1]);
+        choice = argv[2];
+    } else {
+        std::cout << "No arguments provided\n";
+        std::cout << "./main <photo-dir> <choice>\n";
+        return 1;
+    }
+
+    // ThreadPool pool(threadCount);
+    // pool.run();
     
     Image img;
-    std::string dir = "photos/hills.ppm";
     img.source(dir);
-    char choice = 'l';
-    img.greyscale(choice);
+    img.greyscale(*choice);
 }

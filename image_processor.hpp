@@ -1,9 +1,10 @@
 #ifndef IMAGE_PROCESSOR_HPP
 #define IMAGE_PROCESSOR_HPP
 
+#include "greyscale.hpp"
+
 #include <fstream>
 #include <memory>
-#include <vector>
 #include <fstream>
 #include <memory>
 #include <cstdio>
@@ -19,6 +20,9 @@ class Image {
         std::string                   _dstName   = "";       // dir of dest
         bool                          _modifystr = false;
         bool                          _isValid   = true;
+        
+        // greyscale related
+        Greyscale greyscale;
 
         // anything image header related
         long                          _offset  = 0;  // size of the src header
@@ -28,11 +32,6 @@ class Image {
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
-        int luminosityf(unsigned char const red, unsigned char const green, unsigned char const blue);
-        int avgMethodf(unsigned char const red, unsigned char const green, unsigned char const blue);
-        int lightnessf(unsigned char const red, unsigned char const green, unsigned char const blue);
-
-
     public:
         Image();
         void source(std::string &dir); // declare src directory
