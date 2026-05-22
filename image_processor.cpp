@@ -122,16 +122,16 @@ void Image::greyscale(char &fmethod) {
 
         switch (fmethod) {
             case ('l'):
-                grey = this->luminosityf(red, green, blue);
+                grey = greyf.luminosityf(red, green, blue);
                 break;
             case ('a'):
-                grey = this->avgMethodf(red, green, blue);
+                grey = greyf.avgMethodf(red, green, blue);
                 break;
             case ('t'):
-                grey = this->lightnessf(red, green, blue);
+                grey = greyf.lightnessf(red, green, blue);
                 break;
             default:
-                grey = this->avgMethodf(red, green, blue);
+                grey = greyf.avgMethodf(red, green, blue);
                 break;
         }
 

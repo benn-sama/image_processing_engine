@@ -22,7 +22,7 @@ class Image {
         bool                          _isValid   = true;
         
         // greyscale related
-        Greyscale greyscale;
+        Greyscale greyf;
 
         // anything image header related
         long                          _offset  = 0;  // size of the src header
