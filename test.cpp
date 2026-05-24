@@ -43,8 +43,9 @@ struct pngHeader {
 
     void printHex(const std::string& label, const std::vector<unsigned char>& vec) {
         std::cout << label;
-        for (unsigned char byte : vec)
-            std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ' ';
+        for (unsigned char byte : vec) {
+            std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ":" << std::dec << (unsigned int)byte << ' ';
+        }
         std::cout << std::endl;
     }
 
