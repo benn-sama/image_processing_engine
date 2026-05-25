@@ -1,11 +1,17 @@
+#include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <vector>
 #include <iomanip>
+#include <cstring>
+#include <bit>
 
 // 33 bytes in total
 struct pngHeader {
     std::vector<unsigned char> sig;        // 8 bytes: PNG signature
+
+    // IHDR
     std::vector<unsigned char> IDHRLength; // 4 bytes: IHDR/chunk length
     std::vector<unsigned char> chunkType;  // 4 bytes: chunk type
     std::vector<unsigned char> width;      // 4 bytes: width
@@ -16,6 +22,16 @@ struct pngHeader {
     unsigned char filter    = 0; // 1 byte
     unsigned char interlace = 0; // 1 byte
     std::vector<unsigned char> CRC; // 4 bytes: this is padded (takes up more space)
+
+    // iCCP chunks
+    std::vector<unsigned char> iccpLength;       // 4 bytes
+    std::vector<unsigned char> iccpChunkType;    // 4 bytes
+    std::vector<unsigned char> iccpProfileChunk; // 1-79 bytes
+    unsigned char              iccpNull;         // 1 byte
+    unsigned char              iccpCompressionM; // 1 byte
+    std::vector<unsigned char> iccpCompressionP; // iccpLength - used = bytes: used = summation of the iccp chunks - iccpLength
+    std::vector<unsigned char> iccpCRC;         // 4 bytes
+
 
     // IDAT chunk
     std::vector<unsigned char> IDATLength;
@@ -38,7 +54,7 @@ struct pngHeader {
         filter    = (unsigned char)arr[27];
         interlace = (unsigned char)arr[28];
  
-        for (int i = 28; i < 32; ++i) CRC.push_back((unsigned char)arr[i]);
+        for (int i = 29; i < 33; ++i) CRC.push_back((unsigned char)arr[i]);
     }
 
     void printHex(const std::string& label, const std::vector<unsigned char>& vec) {
@@ -68,6 +84,61 @@ struct pngHeader {
         printHex("IHDR - interlace:       ", interlace);
         printHex("CRC:             ", CRC);
     }
+    
+    void IccpChunk(std::vector<char>& arr) {
+        for (int i = 33; i < 37; ++i) {
+            iccpLength.push_back(arr[i]);
+        }
+
+        // from bytes to a useful number
+        std::array<unsigned char, 4> number;
+        std::memcpy(number.data(), iccpLength.data(), 4);
+        uint32_t raw = std::bit_cast<uint32_t>(number);
+        uint32_t length = ((raw >> 24) & 0xFF)       |
+                 ((raw >> 8)  & 0xFF00)     |
+                 ((raw << 8)  & 0xFF0000)   |
+                 ((raw << 24) & 0xFF000000);
+        std::cout << "iccp Length: " << length << std::endl;
+
+        for (int i = 37; i < 41; ++i) {
+            iccpChunkType.push_back(arr[i]);
+        }
+
+        // iccpProfileChunk here (needs to read until it hits a null terminator (00 or 0x00))
+        int count = 41;
+        while (arr[count] != 0) {
+            iccpProfileChunk.push_back(arr[count]);
+            ++count;
+        }
+
+        ++count;
+        iccpNull = arr[count];
+
+        // get the remaining count
+        uint32_t remaining = length - count;
+
+        // iccpCompressionP here (needs to calc: length - used)
+        // including count
+        count++;
+        for (int i = count; i <= remaining; ++i) {
+            iccpCompressionP.push_back(arr[i]);
+        }
+
+        /// check if it is correct
+        if (iccpCompressionP.size() + count == remaining) {
+            std::cout << "compressionP size is equal to the iccpLength" << std::endl;
+        } else {
+            std::cout << "compressionP size: " << iccpCompressionP.size() + count << std::endl;
+            std::cout << "remaining size: " << remaining << std::endl;
+        }
+
+        // CRC (needs to get from where iccpCompressionP leaves off)
+        // including
+        count += remaining;
+        for (int i = count; i < count + 4; ++i) {
+            iccpCRC.push_back(arr[i]);
+        }
+    }
 
     void IDATChunk(std::vector<char>& arr) {
         for (int i = 32; i < 36; ++i) {
@@ -82,6 +153,11 @@ struct pngHeader {
             zlibHeader.push_back(arr[i]);
         }
     }
+
+    void printIccp() {
+        
+    }
+
 
     void printIDAT() {
         printHex("IDAT Length: ", IDATLength);
@@ -109,8 +185,10 @@ int main() {
     pngHeader header(buffer);
     header.printIHDR();
     std::cout << "-------------------------------------------------------------------------\n";
-    header.IDATChunk(buffer);
-    header.printIDAT();
+    header.IccpChunk(buffer);
+
+    // header.IDATChunk(buffer);
+    // header.printIDAT();
 
     // for (int i = 0; i < 32; ++i) {
     //     std::cout << ' ' << (static_cast<unsigned int>(buffer[i]) & 0xFF) << ' ';
