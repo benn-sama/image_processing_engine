@@ -90,7 +90,7 @@ struct pngHeader {
                  ((raw << 8)  & 0xFF0000)   |
                  ((raw << 24) & 0xFF000000);
 
-        std::cout << label << decNum << std::endl;
+        std::cout << label << std::dec << decNum << std::endl;
     }
 
     void printIHDR() {
@@ -154,17 +154,18 @@ struct pngHeader {
         iccpNull = arr[count];
 
         // get the remaining count
-        uint32_t remaining = length - count;
+        uint32_t indexStart = 37;
+        uint32_t remaining = length - (count - indexStart);
 
         // iccpCompressionP here (needs to calc: length - used)
-        // including count
+        // this includes the current count
         count++;
-        for (int i = count; i <= remaining; ++i) {
+        for (int i = count; i < remaining + count; ++i) {
             iccpCompressionP.push_back(arr[i]);
         }
 
         /// check if it is correct
-        if (iccpCompressionP.size() + count == remaining) {
+        if (uint32_t(iccpCompressionP.size()) == remaining) {
             std::cout << "compressionP size is equal to the iccpLength" << std::endl;
         } else {
             std::cout << "compressionP size: " << iccpCompressionP.size() + count << std::endl;
@@ -192,13 +193,13 @@ struct pngHeader {
 
     void IccpPrintDec() {
         std::cout << "----------------iCCp decimal--------------------------" << std::endl;
-        printDecimal("iCCP length (dec): ", iccpLength);
-        printDecimal("iCCP chunk type (dec):   ", iccpChunkType);
-        printDecimal("iCCP profile chunk (dec): ", iccpProfileChunk);
-        printDecimal("iCCP null (dec): ", iccpNull);
-        printDecimal("iCCP compression method (dec): ", iccpCompressionM);
-        printDecimal("iCCP compression profile (dec): ", iccpCompressionP);
-        printDecimal("iCCP CRC (dec): ", iccpCRC);
+        printDecimal("iCCP length: ", iccpLength);
+        printDecimal("iCCP chunk type:   ", iccpChunkType);
+        printDecimal("iCCP profile chunk: ", iccpProfileChunk);
+        printDecimal("iCCP null: ", iccpNull);
+        printDecimal("iCCP compression method: ", iccpCompressionM);
+        printDecimal("iCCP compression profile: ", iccpCompressionP);
+        printDecimal("iCCP CRC: ", iccpCRC);
     }
 
     void IDATChunk(std::vector<char>& arr) {
