@@ -60,7 +60,7 @@ struct pngHeader {
     void printHex(const std::string& label, const std::vector<unsigned char>& vec) {
         std::cout << label;
         for (unsigned char byte : vec) {
-            std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ":" << std::dec << (unsigned int)byte << ' ';
+            std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ' ';
         }
         std::cout << std::endl;
     }
@@ -70,8 +70,31 @@ struct pngHeader {
                   << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte
                   << std::endl;
     }
+    
+    void printDecimal(const std::string& label, unsigned char byte) {
+        std::cout << label << static_cast<int>(byte) << std::endl;
+    }
+
+    void printDecimal(const std::string& label, const std::vector<unsigned char>& vec) {
+        std::array<unsigned char, 4> decVec;
+
+        // copy values from vec to decVec
+        std::memcpy(decVec.data(), vec.data(), 4);
+
+        // convert into bits
+        uint32_t raw = std::bit_cast<uint32_t>(decVec);
+
+        // big-endian
+        uint32_t decNum = ((raw >> 24) & 0xFF)       |
+                 ((raw >> 8)  & 0xFF00)     |
+                 ((raw << 8)  & 0xFF0000)   |
+                 ((raw << 24) & 0xFF000000);
+
+        std::cout << label << decNum << std::endl;
+    }
 
     void printIHDR() {
+        std::cout << "----------------IHDR hex--------------------------" << std::endl;
         printHex("PNG signature:   ", sig);
         printHex("IHDR length:     ", IDHRLength);
         printHex("chunk type:      ", chunkType);
@@ -84,8 +107,24 @@ struct pngHeader {
         printHex("IHDR - interlace:       ", interlace);
         printHex("CRC:             ", CRC);
     }
+
+    void printIHDRDec() {
+        std::cout << "----------------IHDR decimal--------------------------" << std::endl;
+        printDecimal("PNG signature:   ", sig);
+        printDecimal("IHDR length:     ", IDHRLength);
+        printDecimal("chunk type:      ", chunkType);
+        printDecimal("IHDR - width:           ", width);
+        printDecimal("IHDR - height:          ", height);
+        printDecimal("IHDR - bit depth:       ", bitDepth);  // number of bits per channel
+        printDecimal("IHDR - color:           ", color);      // 0 = palette (PLTE), 1 = color, 2 = alpha present
+        printDecimal("IHDR - compress method: ", compressM);
+        printDecimal("IHDR - filter:          ", filter);
+        printDecimal("IHDR - interlace:       ", interlace);
+        printDecimal("CRC:             ", CRC);
+    }
     
     void IccpChunk(std::vector<char>& arr) {
+        // iccp length
         for (int i = 33; i < 37; ++i) {
             iccpLength.push_back(arr[i]);
         }
@@ -98,8 +137,8 @@ struct pngHeader {
                  ((raw >> 8)  & 0xFF00)     |
                  ((raw << 8)  & 0xFF0000)   |
                  ((raw << 24) & 0xFF000000);
-        std::cout << "iccp Length: " << length << std::endl;
 
+        // iccp chunk type
         for (int i = 37; i < 41; ++i) {
             iccpChunkType.push_back(arr[i]);
         }
@@ -138,6 +177,28 @@ struct pngHeader {
         for (int i = count; i < count + 4; ++i) {
             iccpCRC.push_back(arr[i]);
         }
+    }
+
+    void IccpPrint() {
+        std::cout << "----------------iCCp hex--------------------------" << std::endl;
+        printHex("iCCP length: ", iccpLength);
+        printHex("iCCP chunk type:   ", iccpChunkType);
+        printHex("iCCP profile chunk: ", iccpProfileChunk);
+        printHex("iCCP null: ", iccpNull);
+        printHex("iCCP compression method: ", iccpCompressionM);
+        printHex("iCCP compression profile: ", iccpCompressionP);
+        printHex("iCCP CRC: ", iccpCRC);
+    }
+
+    void IccpPrintDec() {
+        std::cout << "----------------iCCp decimal--------------------------" << std::endl;
+        printDecimal("iCCP length (dec): ", iccpLength);
+        printDecimal("iCCP chunk type (dec):   ", iccpChunkType);
+        printDecimal("iCCP profile chunk (dec): ", iccpProfileChunk);
+        printDecimal("iCCP null (dec): ", iccpNull);
+        printDecimal("iCCP compression method (dec): ", iccpCompressionM);
+        printDecimal("iCCP compression profile (dec): ", iccpCompressionP);
+        printDecimal("iCCP CRC (dec): ", iccpCRC);
     }
 
     void IDATChunk(std::vector<char>& arr) {
@@ -184,8 +245,10 @@ int main() {
 
     pngHeader header(buffer);
     header.printIHDR();
-    std::cout << "-------------------------------------------------------------------------\n";
+    header.printIHDRDec();
     header.IccpChunk(buffer);
+    header.IccpPrint();
+    header.IccpPrintDec();
 
     // header.IDATChunk(buffer);
     // header.printIDAT();
