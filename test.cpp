@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <cstring>
 #include <bit>
+#include <array>
+#include <cstring>
 
 // 33 bytes in total
 struct pngHeader {
@@ -34,7 +36,8 @@ struct pngHeader {
 
 
     // IDAT chunk
-    std::vector<unsigned char> IDATLength;
+    std::vector<unsigned char> IDATLength; // this includes the summation of zlibheader, deflate data, and adler-32
+    std::vector<unsigned char> IDATSig;
     std::vector<unsigned char> IDAT;
     std::vector<unsigned char> zlibHeader;
     std::vector<unsigned char> DEFLATEdata;
@@ -77,6 +80,7 @@ struct pngHeader {
 
     void printDecimal(const std::string& label, const std::vector<unsigned char>& vec) {
         std::array<unsigned char, 4> decVec;
+        
 
         // copy values from vec to decVec
         std::memcpy(decVec.data(), vec.data(), 4);
@@ -231,6 +235,24 @@ struct pngHeader {
     }
 };
 
+struct IDATChunk {
+    std::array<unsigned char, 4> length;
+    std::array<unsigned char, 4> chunkType;
+    std::vector<unsigned char> data;
+    std::array<unsigned char, 4> CRC;
+    uint32_t lengthD = 0;
+};
+
+uint32_t to_decimal(std::array<unsigned char, 4> IDATLengthHex) {
+        uint32_t raw = std::bit_cast<uint32_t>(IDATLengthHex);
+        uint32_t length = ((raw >> 24) & 0xFF)       |
+                 ((raw >> 8)  & 0xFF00)     |
+                 ((raw << 8)  & 0xFF0000)   |
+                 ((raw << 24) & 0xFF000000);
+
+        return length;
+}
+
 int main() {
     std::fstream* f = new std::fstream("photos/car-p.png", std::ios::in | std::ios::binary);
 
@@ -244,12 +266,40 @@ int main() {
     std::vector<char> buffer = std::vector<char>(size);
     f->read(buffer.data(), size);
 
-    pngHeader header(buffer);
-    header.printIHDR();
-    header.printIHDRDec();
-    header.IccpChunk(buffer);
-    header.IccpPrint();
-    header.IccpPrintDec();
+    int startIndex = 0;
+    for (int i = 0; i < int(buffer.size()) - 4; ++i) {
+        if (std::memcmp(buffer.data() + i, "IDAT", 4) == 0) {
+            startIndex = i;
+            std::cout << "StartIndex: " << startIndex << std::endl;
+            break;
+        }
+    }
+
+    std::vector<IDATChunk> chunks;
+    IDATChunk temp;
+    for (int i = startIndex; i < int(buffer.size()); ++i) {
+        if (std::memcmp(buffer.data() + i, "IEND", 4) == 0) {
+            break;
+        }
+
+        // stopped here
+        if (std::memcmp(buffer.data() + i, "IDAT", 4) == 0) {
+            std::array<unsigned char, 4> length = {
+                static_cast<unsigned char>(buffer[i - 4]),
+                static_cast<unsigned char>(buffer[i - 3]), 
+                static_cast<unsigned char>(buffer[i - 2]), 
+                static_cast<unsigned char>(buffer[i -1])};
+        }
+    }
+    
+
+    
+    // pngHeader header(buffer);
+    // header.printIHDR();
+    // header.printIHDRDec();
+    // header.IccpChunk(buffer);
+    // header.IccpPrint();
+    // header.IccpPrintDec();
 
     // header.IDATChunk(buffer);
     // header.printIDAT();
