@@ -2,12 +2,34 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <sys/types.h>
 #include <vector>
 #include <iomanip>
 #include <cstring>
 #include <bit>
 #include <array>
 #include <cstring>
+
+void printHex(const std::string& label, const std::vector<unsigned char>& vec) {
+    std::cout << label;
+    for (unsigned char byte : vec) {
+        std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ' ';
+    }
+    std::cout << std::endl;
+}
+void printHex(const std::string& label, const std::array<unsigned char, 4>& vec) {
+    std::cout << label;
+    for (unsigned char byte : vec) {
+        std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ' ';
+    }
+    std::cout << std::endl;
+}
+
+void printHex(const std::string& label, unsigned char byte) {
+    std::cout << label
+                << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte
+                << std::endl;
+}
 
 // 33 bytes in total
 struct pngHeader {
@@ -58,20 +80,6 @@ struct pngHeader {
         interlace = (unsigned char)arr[28];
  
         for (int i = 29; i < 33; ++i) CRC.push_back((unsigned char)arr[i]);
-    }
-
-    void printHex(const std::string& label, const std::vector<unsigned char>& vec) {
-        std::cout << label;
-        for (unsigned char byte : vec) {
-            std::cout << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte << ' ';
-        }
-        std::cout << std::endl;
-    }
-
-    void printHex(const std::string& label, unsigned char byte) {
-        std::cout << label
-                  << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (unsigned int)byte
-                  << std::endl;
     }
     
     void printDecimal(const std::string& label, unsigned char byte) {
@@ -235,12 +243,23 @@ struct pngHeader {
     }
 };
 
+
+// IDAT chunks
 struct IDATChunk {
     std::array<unsigned char, 4> length;
     std::array<unsigned char, 4> chunkType;
     std::vector<unsigned char> data;
     std::array<unsigned char, 4> CRC;
     uint32_t lengthD = 0;
+
+    void print() {
+        std::cout << "----------------IDAT hex--------------------------" << std::endl;
+        printHex("IDAT length: ", length);
+        printHex("IDAT chunk type (identifier):   ", chunkType);
+        printHex("IDAT data: ", data);
+        printHex("IDAT CRC: ", CRC);
+        std::cout << "IDAT Length (decimal): " << lengthD << std::endl;
+    }
 };
 
 uint32_t to_decimal(std::array<unsigned char, 4> IDATLengthHex) {
@@ -266,31 +285,62 @@ int main() {
     std::vector<char> buffer = std::vector<char>(size);
     f->read(buffer.data(), size);
 
-    int startIndex = 0;
-    for (int i = 0; i < int(buffer.size()) - 4; ++i) {
-        if (std::memcmp(buffer.data() + i, "IDAT", 4) == 0) {
-            startIndex = i;
-            std::cout << "StartIndex: " << startIndex << std::endl;
-            break;
-        }
-    }
+    // int startIndex = 0;
+    // for (int i = 0; i < int(buffer.size()) - 4; ++i) {
+    //     if (std::memcmp(buffer.data() + i, "IDAT", 4) == 0) {
+    //         startIndex = i;
+    //         std::cout << "StartIndex: " << startIndex << std::endl;
+    //         break;
+    //     }
+    // }
 
     std::vector<IDATChunk> chunks;
     IDATChunk temp;
-    for (int i = startIndex; i < int(buffer.size()); ++i) {
-        if (std::memcmp(buffer.data() + i, "IEND", 4) == 0) {
-            break;
-        }
+    int currIndex = 0;
 
+    std::cout << "Looking for IDAT chunks\n" << std::endl;
+    while (std::memcmp(buffer.data() + currIndex, "IEND", 4) != 0) {
         // stopped here
-        if (std::memcmp(buffer.data() + i, "IDAT", 4) == 0) {
-            std::array<unsigned char, 4> length = {
-                static_cast<unsigned char>(buffer[i - 4]),
-                static_cast<unsigned char>(buffer[i - 3]), 
-                static_cast<unsigned char>(buffer[i - 2]), 
-                static_cast<unsigned char>(buffer[i -1])};
+        if (std::memcmp(buffer.data() + currIndex, "IDAT", 4) == 0) {
+            std::cout << "Found IDAT chunk @: " << currIndex << std::endl;
+            std::array<unsigned char, 4> hLength = {
+                static_cast<unsigned char>(buffer[currIndex - 4]),
+                static_cast<unsigned char>(buffer[currIndex - 3]), 
+                static_cast<unsigned char>(buffer[currIndex - 2]), 
+                static_cast<unsigned char>(buffer[currIndex - 1])
+            };
+
+            uint32_t dLength = to_decimal(hLength);
+
+            std::array<unsigned char, 4> chunkT = {
+                static_cast<unsigned char>(buffer[currIndex]),
+                static_cast<unsigned char>(buffer[currIndex + 1]),
+                static_cast<unsigned char>(buffer[currIndex + 2]),
+                static_cast<unsigned char>(buffer[currIndex + 3])
+            };
+
+            std::vector<unsigned char> data;
+            for (int j = currIndex + 4; j < dLength + currIndex; ++j) {
+                data.push_back(buffer[j]);
+            }
+            currIndex += dLength;
+
+            std::array<unsigned char, 4> CRC = {
+                static_cast<unsigned char>(buffer[currIndex]),
+                static_cast<unsigned char>(buffer[currIndex + 1]),
+                static_cast<unsigned char>(buffer[currIndex + 2]),
+                static_cast<unsigned char>(buffer[currIndex + 3])
+            };
+
+            chunks.emplace_back(hLength, chunkT, data, CRC, dLength);
         }
+        ++currIndex;
     }
+
+    std::cout << "Found IEND @: " << currIndex << std::endl;
+
+
+}
     
 
     
@@ -307,4 +357,3 @@ int main() {
     // for (int i = 0; i < 32; ++i) {
     //     std::cout << ' ' << (static_cast<unsigned int>(buffer[i]) & 0xFF) << ' ';
     // }
-}
