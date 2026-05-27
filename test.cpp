@@ -337,7 +337,11 @@ int main() {
         ++currIndex;
     }
 
-    std::cout << "Found IEND @: " << currIndex << std::endl;
+    chunks[0].print();
+    chunks[1].print();
+    chunks[int(chunks.size())].print();
+
+    std::cout << "Found IEND @: " << std::dec << currIndex << std::endl;
 
 
 }
