@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include <sys/types.h>
+#include <unordered_map>
 #include <vector>
 
 LZ77::LZ77() {}
@@ -78,85 +79,18 @@ void LZ77::parse() {
 // }
 
 void LZ77::compress() {
-    size_t currIndex = 0;
+    // int const LOOK_AHEAD_SIZE = 4;
+    // int const CHAR_SIZE       = 4;
+    std::unordered_map<unsigned char, int> windowBuffer;
 
-    while (currIndex < buffer.size()) {
-        int bestLen = 0;
-        int bestPos = 0;
-
-        // search window: [start, currIndex)
-        size_t winStart = (currIndex >= HALF_MAX_WINDOW_SIZE) ? currIndex - HALF_MAX_WINDOW_SIZE : 0;
-
-        for (size_t i = winStart; i < currIndex; ++i) {
-            int len = 0;
-            // extend match
-            while (currIndex + len < buffer.size() && buffer[i + len] == buffer[currIndex + len]) {
-                ++len;
-            }
-            
-            if (len > bestLen) {
-                bestLen = len;
-                bestPos = currIndex - i;  // how far back
-            }
-        }
-
-        u_int8_t nextChar = (currIndex + bestLen < buffer.size())
-                            ? buffer[currIndex + bestLen]
-                            : 0;
-
-        cData.emplace_back(Data{
-            u_int8_t(bestPos),
-            u_int8_t(bestLen),
-            nextChar
-        });
-
-        currIndex += bestLen + 1;
+    for (int i = 0; i < int(buffer.size()) - 8; ++i ) {
+        // window
+        std::cout << "window:     " << buffer[i] << buffer[i + 1] << buffer[i + 2] << buffer[i + 3] << std::endl;
+        
+        // right lookahead
+        std::cout << "look-ahead: " << buffer[i + 4] << buffer[i + 5] << buffer[i + 6] << buffer[i + 7] << std::endl;
     }
-
-    for (auto& element : cData) {
-        element.print();
-    }
-
-    // int currIndex = 0;
-    // Data data = {0, 0, 'a'};
-    // bool isExit = false;
-
-    // while (currIndex < int(buffer.size())) {
-    //     for (int i = currIndex; i < currIndex + HALF_MAX_WINDOW_SIZE; ++i) {
-    //         Data data = {0, 0, 'a'};
-    //         int bestLen = 0;
-    //         int bestPos = 0;
-
-    //         for (int j = currIndex + HALF_MAX_WINDOW_SIZE; j < currIndex + MAX_WINDOW_SIZE; ++j) {
-    //             while (std::memcmp(buffer.data() + i, buffer.data() + j, length * sizeof(int)) == 0) {
-    //                 bestPos = j - i;
-    //                 ++bestLen;
-    //                 ++length;
-    //                 std::cout << buffer[i] << ":" << buffer[j] << " - " << i << ":" << j << std::endl;
-    //                 std::cout << "<" << bestPos << ", " << bestLen << ">" << buffer[j] << std::endl; 
-    //                 isExit = true;
-    //             }
-    //             data.pos  = u_int8_t(bestPos);
-    //             data.len  = u_int8_t(bestLen);
-    //             data.code = u_int8_t(buffer[j]); 
-    //             cData.emplace_back(data);
-
-    //             if (isExit) {
-    //                 isExit = false;
-    //                 break;
-    //             }
-    //         }
-
-    //         bestPos = 0;
-    //         bestLen = 0;
-    //         length = 1;
-    //     }
-    //     currIndex += HALF_MAX_WINDOW_SIZE;
-    // }
-
-    // for (auto& temp : cData) {
-    //     temp.print();
-    // }
+    
 }
 
 void LZ77::print() {

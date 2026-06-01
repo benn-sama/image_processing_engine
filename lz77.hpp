@@ -21,7 +21,7 @@ struct Data {
     u_int8_t code;
 
     void print() {
-        std::cout << "<" << (int)pos << ", " << (int)len << ">" << (char)code << std::endl;
+        std::cout << "<" << (char)pos << ", " << (char)len << ">" << (char)code << std::endl;
     }
 };
 
