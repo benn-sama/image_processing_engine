@@ -14,7 +14,6 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-
 struct Data {
     u_int8_t pos;
     u_int8_t len;
