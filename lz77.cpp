@@ -46,13 +46,12 @@ void LZ77::parse() {
 
 
 void LZ77::compress() {
-    // int const LOOK_AHEAD_SIZE = 4;
+    int const LOOK_AHEAD_SIZE = 4;
     // int const CHAR_SIZE       = 4;
-    std::unordered_map<u_int16_t, int> bufferHash;
-    u_int16_t windowPackage    = pack(buffer[0], buffer[1], buffer[2], buffer[3]);
-    u_int16_t lookaheadPackage = pack(buffer[4], buffer[5], buffer[6], buffer[7]);
+    std::unordered_map<u_int32_t, u_int8_t> bufferHash;
+    u_int32_t windowPackage    = pack(buffer[0], buffer[1], buffer[2], buffer[3]);
 
-    for (int i = 8; i < int(buffer.size()) - 8; ++i ) {
+    for (int i = 4; i < int(buffer.size()) - 8; ++i ) {
         // window
         // std::cout << "window:     " << buffer[i] << buffer[i + 1] << buffer[i + 2] << buffer[i + 3] << std::endl;
         // if (buffer[i]     == buffer[i + 4] && 
@@ -63,16 +62,27 @@ void LZ77::compress() {
         // }
         auto it = bufferHash.find(windowPackage);
         if (it == bufferHash.end()) {
-            bufferHash[windowPackage] = 0;
+            bufferHash[windowPackage] = i;
+            cData.emplace_back(Data{(u_int8_t)i, 
+                                    0, 
+                                    0, 
+                                    buffer[i + 1]
+                                   });
         } else {
-            // code to make a tree here
-            // something like:
-            // cData.insert(<current - foundPos, length, nextChar>) 
+            cData.emplace_back(Data{(u_int8_t)i,
+                                    static_cast<u_int8_t>(i - bufferHash[windowPackage]),
+                                    4,
+                                    buffer[i + 1]});
+            bufferHash[windowPackage] = i;
         }
-        
+        enqueue(windowPackage, buffer[i]);
 
         // // right lookahead
         // std::cout << "look-ahead: " << buffer[i + 4] << buffer[i + 5] << buffer[i + 6] << buffer[i + 7] << std::endl;
+    }
+
+    for (auto& i : cData) {
+        i.print();
     }
     
 }

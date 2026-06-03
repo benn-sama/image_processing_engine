@@ -15,20 +15,19 @@
 #include <iostream>
 #include <sstream>
 struct Data {
+    u_int8_t index;
     u_int8_t pos;
     u_int8_t len;
     u_int8_t code;
 
     void print() {
-        std::cout << "<" << (char)pos << ", " << (char)len << ">" << (char)code << std::endl;
+        std::cout << (int)index << "<" << (int)pos << ", " << (int)len << ">" << (unsigned char)code << std::endl;
     }
 };
 
 class LZ77 {
-    static const size_t                    MAX_WINDOW_SIZE = 64;     // window size of the LZ77 window
-    std::array<u_int8_t, MAX_WINDOW_SIZE>  window;  // the actual LZ77 window
+    static const size_t                    WINDOW_SIZE = 64;     // window size of the LZ77 window
 
-    u_int16_t const                        HALF_MAX_WINDOW_SIZE  = 32; // 0-127 and 128-256
     u_int16_t                              length = 1;
     
     std::ifstream file{"story-test.txt"};
