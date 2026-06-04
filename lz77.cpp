@@ -1,6 +1,8 @@
 #include "lz77.hpp"
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <functional>
 #include <sys/types.h>
 #include <unordered_map>
 #include <vector>
@@ -74,6 +76,7 @@ void LZ77::compress() {
                                     4,
                                     buffer[i + 1]});
             bufferHash[windowPackage] = i;
+            i += 3;
         }
         enqueue(windowPackage, buffer[i]);
 
@@ -85,6 +88,16 @@ void LZ77::compress() {
         i.print();
     }
     
+}
+
+void LZ77::compress2() {
+    std::array<u_int8_t, 32768> window;
+    size_t current_index = 0;
+
+    std::unordered_map<std::string, int, string_hash, std::equal_to<>> map;
+    
+    std::string_view viewPackage(reinterpret_cast<const char*>(window.data()), 256);
+    auto it = map.find(viewPackage);
 }
 
 void LZ77::print() {

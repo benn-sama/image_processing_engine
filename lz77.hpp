@@ -11,9 +11,11 @@
 #include <cstddef>
 #include <fstream>
 #include <sys/types.h>
+#include <unordered_map>
 #include <vector>
 #include <iostream>
 #include <sstream>
+
 struct Data {
     u_int8_t index;
     u_int8_t pos;
@@ -25,6 +27,22 @@ struct Data {
     }
 };
 
+// 258 matchingWindowSize
+struct alignas(4096) Package {
+    std::array<u_int8_t, 32768> window; // 32 * 1024 = 32KB
+    size_t currentIndex = 0;
+    
+    std::unordered_map<std::string, u_int8_t> map;
+
+};
+
+struct string_hash {
+    using is_transparent = void; // opt-in marker
+    size_t operator()(std::string_view sv)  const { return std::hash<std::string_view>{}(sv); }
+    size_t operator()(const std::string& s) const { return std::hash<std::string_view>{}(s); }
+    size_t operator()(const char* s)        const { return std::hash<std::string_view>{}(s);}
+}
+
 class LZ77 {
     static const size_t                    WINDOW_SIZE = 64;     // window size of the LZ77 window
 
@@ -33,11 +51,13 @@ class LZ77 {
     std::ifstream file{"story-test.txt"};
     std::vector<unsigned char> buffer;         // the thing being scanned
     std::vector<Data> cData;
+    std::array<u_int8_t, 32768> window;
 
     public:
         LZ77();
         void parse(); // file content is split into unsigned chars
         void compress();
+        void compress2();
         void print();
         void printE();
 };
