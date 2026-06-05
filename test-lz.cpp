@@ -8,6 +8,6 @@ int main() {
     lz77.parse();
     // // lz77.printE();
     lz77.compress();
-    // lz77.print();
+    lz77.print();
     return 0;
 }

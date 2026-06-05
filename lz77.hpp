@@ -36,22 +36,23 @@ struct alignas(4096) Package {
 
 };
 
+// allows string view to allocate a string
 struct string_hash {
     using is_transparent = void; // opt-in marker
     size_t operator()(std::string_view sv)  const { return std::hash<std::string_view>{}(sv); }
     size_t operator()(const std::string& s) const { return std::hash<std::string_view>{}(s); }
     size_t operator()(const char* s)        const { return std::hash<std::string_view>{}(s);}
-}
+};
 
 class LZ77 {
-    static const size_t                    WINDOW_SIZE = 64;     // window size of the LZ77 window
+    static constexpr size_t MAX_WINDOW_SIZE = 64;     // window size of the LZ77 window
 
-    u_int16_t                              length = 1;
+    u_int16_t length = 1;
     
     std::ifstream file{"story-test.txt"};
     std::vector<unsigned char> buffer;         // the thing being scanned
     std::vector<Data> cData;
-    std::array<u_int8_t, 32768> window;
+    std::array<u_int8_t, 64> window; // 32768
 
     public:
         LZ77();
