@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <exception>
 #include <functional>
 #include <sys/types.h>
 #include <unordered_map>
@@ -45,50 +46,6 @@ void LZ77::parse() {
     // split content into unsigned chars
     buffer = std::vector<unsigned char>(content.begin(), content.end());
 }
-
-
-// void LZ77::compress() {
-//     int const LOOK_AHEAD_SIZE = 4;
-//     // int const CHAR_SIZE       = 4;
-//     std::unordered_map<u_int32_t, u_int8_t> bufferHash;
-//     u_int32_t windowPackage    = pack(buffer[0], buffer[1], buffer[2], buffer[3]);
-
-//     for (int i = 4; i < int(buffer.size()) - 8; ++i ) {
-//         // window
-//         // std::cout << "window:     " << buffer[i] << buffer[i + 1] << buffer[i + 2] << buffer[i + 3] << std::endl;
-//         // if (buffer[i]     == buffer[i + 4] && 
-//         //     buffer[i + 1] == buffer[i + 5] && 
-//         //     buffer[i + 2] == buffer[i + 6] && 
-//         //     buffer[i + 3] == buffer[i + 7]) {
-            
-//         // }
-//         auto it = bufferHash.find(windowPackage);
-//         if (it == bufferHash.end()) {
-//             bufferHash[windowPackage] = i;
-//             cData.emplace_back(Data{(u_int8_t)i, 
-//                                     0, 
-//                                     0, 
-//                                     buffer[i + 1]
-//                                    });
-//         } else {
-//             cData.emplace_back(Data{(u_int8_t)i,
-//                                     static_cast<u_int8_t>(i - bufferHash[windowPackage]),
-//                                     4,
-//                                     buffer[i + 1]});
-//             bufferHash[windowPackage] = i;
-//             i += 3;
-//         }
-//         enqueue(windowPackage, buffer[i]);
-
-//         // // right lookahead
-//         // std::cout << "look-ahead: " << buffer[i + 4] << buffer[i + 5] << buffer[i + 6] << buffer[i + 7] << std::endl;
-//     }
-
-//     for (auto& i : cData) {
-//         i.print();
-//     }
-    
-// }
 /*
  * Dynamic LZ77 algorithm
  */
@@ -115,12 +72,15 @@ void LZ77::compress() {
         }
 
         // quick check if current search window length can support that last numbers
+        std::cout << search_window_tail + MAX_WINDOW_SIZE  << ":" << size_t(buffer.size()) << std::endl;  
         if (search_window_tail + MAX_WINDOW_SIZE <= size_t(buffer.size())) {
             search_window_tail += MAX_WINDOW_SIZE;
         } else {
-            search_window_tail += (size_t(buffer.size()) - search_window_len);
+            search_window_tail += (size_t(buffer.size()) - search_window_tail);
             search_window_len  = search_window_tail;
         }
+
+        map.clear();
     }
 }
 

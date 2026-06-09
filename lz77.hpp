@@ -49,7 +49,7 @@ class LZ77 {
 
     u_int16_t length = 1;
     
-    std::ifstream file{"story-test.txt"};
+    std::ifstream file{"story.txt"};
     std::vector<unsigned char> buffer;         // the thing being scanned
     std::vector<Data> cData;
     std::array<u_int8_t, 64> window; // 32768
