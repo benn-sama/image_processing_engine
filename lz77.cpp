@@ -8,20 +8,22 @@
 #include <unordered_map>
 #include <vector>
 
-/*
- * This will pack the bytes, into one single 32x
- */
-u_int32_t pack(unsigned char a, unsigned char b, unsigned char c, unsigned char d) {
-    return (u_int32_t)a << 24 
-         | (u_int32_t)b << 16
-         | (u_int32_t)c << 8
-         | (u_int32_t)d; 
-}
+// bit packing is cool, but only works if all the bytes fit in one single string. 
+// for our use case, it is useless
+// /*
+//  * This will pack the bytes, into one single 32x
+//  */
+// u_int32_t pack(unsigned char a, unsigned char b, unsigned char c, unsigned char d) {
+//     return (u_int32_t)a << 24 
+//          | (u_int32_t)b << 16
+//          | (u_int32_t)c << 8
+//          | (u_int32_t)d; 
+// }
 
-// shifts bits to the left and assigns newByte into 
-void enqueue(u_int32_t& package, unsigned char newByte) {
-    package = (package << 8) | newByte; // shifts by 8, then 'appends' new byte to 0-8
-}
+// // shifts bits to the left and assigns newByte into 
+// void enqueue(u_int32_t& package, unsigned char newByte) {
+//     package = (package << 8) | newByte; // shifts by 8, then 'appends' new byte to 0-8
+// }
 
 // this is here for reference
 // void dequeue(u_int32_t& package) {
@@ -31,6 +33,11 @@ void enqueue(u_int32_t& package, unsigned char newByte) {
 
 LZ77::LZ77() {}
 
+
+/*
+This parses the data
+
+*/
 void LZ77::parse() {
     std::string line;
 
@@ -55,7 +62,7 @@ void LZ77::compress() {
     size_t       search_window_len = 8;
     std::unordered_map<std::string, int, string_hash, std::equal_to<>> map;
 
-    
+    // actual lz77 compression methods
     while (current_index < size_t(buffer.size())) {
         for (; current_index < search_window_tail; ++current_index) {
             std::string_view viewPackage(reinterpret_cast<const char*>(buffer.data()) + current_index, std::min(search_window_len, buffer.size()));
