@@ -5,7 +5,7 @@
 
 class Greyscale {    
     public:
-        Greyscale();
+        Greyscale() {};
         int luminosityf(unsigned char const red, unsigned char const green, unsigned char const blue);
         int avgMethodf(unsigned char const red, unsigned char const green, unsigned char const blue);
         int lightnessf(unsigned char const red, unsigned char const green, unsigned char const blue);

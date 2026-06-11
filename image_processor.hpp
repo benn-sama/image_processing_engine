@@ -28,7 +28,7 @@ class Image {
         long                          _offset  = 0;  // size of the src header
         int                           _width   = 0;  // width of the image
         int                           _height  = 0;  // width of the image
-        int                           _maxval  = 0;  // maxval of the image
+        int                           _maxval  = 0;  // maxval of the image size of bits in one channel
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
@@ -38,6 +38,10 @@ class Image {
         void dest(std::string &dir);   // declare dest directory
         void clone();
         void greyscale(char &fmethod);
+        std::fstream* get_ptr() { return _src.get(); };
+        int get_width()   { return _width;  }
+        int get_height()  { return _height; }
+        long get_offset() { return _offset; };
 };
 
 #endif

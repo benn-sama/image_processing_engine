@@ -55,7 +55,11 @@ void Image::source(std::string &dir) {
     _srcName = dir;
     _offset = this->ppm_header_size(dir); // this also initializes width, height, and maxval
 
-    if (_offset <= 0) { _isValid = false; }
+    if (_offset <= 0) { 
+        _isValid = false; 
+    } else {
+        _src->seekg(_offset, std::ios::beg);
+    }
 }
 
 void Image::dest(std::string &dir) {
