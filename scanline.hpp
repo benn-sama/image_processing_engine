@@ -19,6 +19,7 @@ class Scanline {
         size_t _height    = 0;
         size_t _channel   = 0; // this needs to be dynamic, 3 = RGB, how many channels
         size_t _bit_depth = 0; // how many bits in one channel
+        size_t _bpp       = (_channel * _bit_depth) / 8;
 
 
         /*
@@ -34,8 +35,18 @@ class Scanline {
         void allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream); // allocates vector
         void filter();
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
+        
+        // algorithms
         void sub();
+        void up();
+        void paethf();
+        
+        // subf prolly needs to to priv or just needs to be seperated into it's own func rather than it being owned by a class
         int subf(int const current_byte, int const bpp); // the math func for sub
+        int upf(int const current_byte, int const prior);
+        int paethf(int const current, int const floor);
+        
+        // this needs to be deleted  in the future (this is for testing purposes only )
         void print_new_img() {
             for (int i = 0; i < _width; ++i) {
                 for (int j = 0; j < _height; ++j) {

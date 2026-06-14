@@ -13,11 +13,15 @@ void Scanline::allocate(size_t const width, size_t const height, long const offs
     // w = 2268, h = 4032
     std::cout << "width: " << width << std::endl << "height: " << height << std::endl;
 
+    // stores the the old img, just in case for later
+    // allocates new img, so we don't have to allocate memory, since it will always be allocated already
     for (size_t i = 0; i < width; ++i) {
         _old_img.push_back({}); // create a row before accessing
+        _new_img.push_back({});
         for (size_t j = 0; j < height; ++j) {
             buffer_stream->read(buffer.get(), 1);
             _old_img[i].push_back(buffer[0]);
+            _new_img[i].push_back(buffer[0]);
             // std::cout << "pushed: " << "[" << i << "]" << "[" << j << "]" << " = " << (int)_old_img[i][j] << std::endl;
         }
     }
@@ -53,11 +57,30 @@ n      = (channel * bit_depth) / 8
 */
 void Scanline::sub() {
     for (size_t i = 0; i < _width; ++i) {
-        _new_img.push_back({}); // allocates row so it's accessible
-
         for (size_t j = 0; j < _height; ++j) {
             int bpp = (j < 3) ? 0 : _old_img[i][j - 3];
-            _new_img[i].push_back(subf((int)_old_img[i][j], (int)bpp));
+            _new_img[i][j] = subf((int)_old_img[i][j], (int)bpp);
         }
     }
+}
+
+int Scanline::upf(int const current_byte, int const prior) {
+    return current_byte < prior ? current_byte - prior  + 256: current_byte - prior;
+}
+
+/*
+up() = raw(x) - prior(x)
+prior(x) = byte of previous line of index j, [i - 1][j]
+*/
+void Scanline::up() {
+    for (int i = 0; i < _width; ++i) {
+        for (int j = 0; j < _height; ++j) {
+            int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
+            _new_img[i][j] = upf((int)_old_img[i][j], prior);
+        }
+    }
+}
+
+int Scanline::paethf(int const current, int const floor) {
+    
 }
