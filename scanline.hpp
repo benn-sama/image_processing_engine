@@ -15,10 +15,10 @@ class Scanline {
         std::vector<std::vector<unsigned char>> _new_img;
         std::vector<std::vector<unsigned char>> _old_img;
 
-        size_t _width  = 0;
-        size_t _height = 0;
-        size_t _channel = 3; // this needs to be dynamic, 3 = RGB, how many channels
-        size_t _bit_depth = 8; // how many bits in one channel
+        size_t _width     = 0;
+        size_t _height    = 0;
+        size_t _channel   = 0; // this needs to be dynamic, 3 = RGB, how many channels
+        size_t _bit_depth = 0; // how many bits in one channel
 
 
         /*
@@ -30,6 +30,7 @@ class Scanline {
         bpp    = # of bytes per pixel complete, rounding up to one (channel x bit_depth) / 8
         */
         public:
+        Scanline(size_t width, size_t height, size_t channel, size_t bit_depth) : _width(width), _height(height), _channel(channel), _bit_depth(bit_depth) {};
         void allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream); // allocates vector
         void filter();
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
