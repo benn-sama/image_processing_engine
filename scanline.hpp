@@ -39,13 +39,15 @@ class Scanline {
         // algorithms
         void sub();
         void up();
-        void paethf();
+        void avg();
+        void paeth();
         
         // subf prolly needs to to priv or just needs to be seperated into it's own func rather than it being owned by a class
-        int subf(int const current_byte, int const bpp); // the math func for sub
+        int subf(int const current_byte, int const go_back_n); // the math func for sub
         int upf(int const current_byte, int const prior);
+        int avgf(int const current_byte, int const prior, int const go_back_n);
         int paethf(int const current, int const floor);
-        
+
         // this needs to be deleted  in the future (this is for testing purposes only )
         void print_new_img() {
             for (int i = 0; i < _width; ++i) {

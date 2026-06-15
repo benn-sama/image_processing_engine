@@ -1,8 +1,10 @@
 #include "scanline.hpp"
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <sys/types.h>
+#include <cmath>
 
 // this shouldn't assume that it is offset, must fix later
 void Scanline::allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
@@ -46,8 +48,8 @@ void Scanline::verify(size_t const width, size_t const height, long const offset
     buffer_stream->seekg(offset, std::ios::beg);
 }
 
-int Scanline::subf(int const current_byte, int const bpp) {
-    return bpp == 0 ? 0 : (current_byte - bpp) % 256;
+int Scanline::subf(int const current_byte, int const go_back_n) {
+    return 0 ? 0 : (current_byte - go_back_n) % 256;
 }
 
 /*
@@ -58,8 +60,8 @@ n      = (channel * bit_depth) / 8
 void Scanline::sub() {
     for (size_t i = 0; i < _width; ++i) {
         for (size_t j = 0; j < _height; ++j) {
-            int bpp = (j < 3) ? 0 : _old_img[i][j - 3];
-            _new_img[i][j] = subf((int)_old_img[i][j], (int)bpp);
+            int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
+            _new_img[i][j] = subf((int)_old_img[i][j], go_back_n);
         }
     }
 }
@@ -81,6 +83,33 @@ void Scanline::up() {
     }
 }
 
+/*
+avg(x) = raw(x) - floor((raw(x - bpp) + prior(x)) / 2)
+floor() = round to the smallest whole int
+bpp = see header
+prior(x) = previous scanline byte = [i - 1][j] 
+*/
+int Scanline::avgf(int const current_byte, int const prior, int const go_back_n) {
+    return (current_byte - (int)std::floor((go_back_n + prior) / 2)) % 256;
+}
+
+// this is identical to up's algorithm (prolly can do something about it)
+void Scanline::avg() {
+    for (int i = 0; i < _width; ++i) {
+        for (int j = 0; j < _height; ++j) {
+            int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
+            int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
+            
+            _new_img[i][j] = avgf((int)_old_img[i][j], prior, go_back_n);
+        }
+    }
+}
+
+void Scanline::paeth() {
+
+}
+
 int Scanline::paethf(int const current, int const floor) {
     
 }
+
