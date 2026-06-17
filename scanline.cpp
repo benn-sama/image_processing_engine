@@ -2,6 +2,7 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <sys/types.h>
 #include <cmath>
@@ -49,7 +50,7 @@ void Scanline::verify(size_t const width, size_t const height, long const offset
 }
 
 int Scanline::subf(int const current_byte, int const go_back_n) {
-    return 0 ? 0 : (current_byte - go_back_n) % 256;
+    return go_back_n <= 0 ? 0 : (current_byte - go_back_n) % 256;
 }
 
 /*
@@ -67,7 +68,7 @@ void Scanline::sub() {
 }
 
 int Scanline::upf(int const current_byte, int const prior) {
-    return current_byte < prior ? current_byte - prior  + 256: current_byte - prior;
+    return current_byte < prior ? current_byte - prior + 256: current_byte - prior;
 }
 
 /*
@@ -90,7 +91,8 @@ bpp = see header
 prior(x) = previous scanline byte = [i - 1][j] 
 */
 int Scanline::avgf(int const current_byte, int const prior, int const go_back_n) {
-    return (current_byte - (int)std::floor((go_back_n + prior) / 2)) % 256;
+    int diff = (current_byte - (int)std::floor((go_back_n + prior) / 2)); 
+    return  diff < 0 ? diff + 256 : diff;
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
@@ -105,11 +107,35 @@ void Scanline::avg() {
     }
 }
 
+/*
+paeth(x) = raw(x) - paethPredictor(raw(x - bpp), prior(x), prior(x-bpp))
+a = raw(x - bpp) // left of current byte
+b = prior(x)     
+c = prior(x-bpp)
+*/
+int Scanline::paethf(int const up, int const left, int const top_left) {
+    int init_est          = up + left - top_left;
+    int current_distance  = std::abs(init_est - up);
+    int left_distance     = std::abs(init_est - left);
+    int top_left_distance = std::abs(init_est - top_left);
+
+    if (current_distance <= left_distance && up <= top_left_distance) {
+        return up;
+    } else if (left_distance <= top_left_distance) {
+        return left;
+    } else {
+        return top_left;
+    }
+}
+
 void Scanline::paeth() {
+    for (int i = 0; i < _width; ++i) {
+        for (int j = 0; j < _height; ++j) {
+            int left     = j < _bpp ? 0 : _old_img[i][j - _bpp];          // check if left is valid
+            int up       = i < 1 ? 0 : _old_img[i - 1][j];
+            int top_left = (i < 1 || j < 1) ? 0 : _old_img[i - 1][j - 1]; // check if top left is valid
 
+            _new_img[i][j] = _old_img[i][j] - paethf(up, left, top_left);
+        }
+    }
 }
-
-int Scanline::paethf(int const current, int const floor) {
-    
-}
-

@@ -42,6 +42,15 @@ class Image {
         int get_width()   { return _width;  }
         int get_height()  { return _height; }
         long get_offset() { return _offset; };
+
+        // testing
+        void print() {
+            std::unique_ptr buffer = std::make_unique<char[]>(3);
+            
+            while (_src->read(buffer.get(), 1)) {
+                std::cout << (int)buffer[0] << std::endl;
+            }
+        }
 };
 
 #endif
