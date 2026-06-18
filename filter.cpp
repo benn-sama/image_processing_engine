@@ -1,4 +1,4 @@
-#include "scanline.hpp"
+#include "filter.hpp"
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -6,9 +6,10 @@
 #include <fstream>
 #include <sys/types.h>
 #include <cmath>
+#include <vector>
 
 // this shouldn't assume that it is offset, must fix later
-void Scanline::allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
+void Filter::allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
     std::unique_ptr buffer = std::make_unique<char[]>(1);
     _width  = width;
     _height = height;
@@ -33,7 +34,7 @@ void Scanline::allocate(size_t const width, size_t const height, long const offs
     buffer_stream->seekg(offset, std::ios::beg);
 }
 
-void Scanline::verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
+void Filter::verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
     std::unique_ptr buffer = std::make_unique<char[]>(1);
 
     for (size_t i = 0; i < width; ++i) {
@@ -49,7 +50,7 @@ void Scanline::verify(size_t const width, size_t const height, long const offset
     buffer_stream->seekg(offset, std::ios::beg);
 }
 
-int Scanline::subf(int const current_byte, int const go_back_n) {
+int Filter::subf(int const current_byte, int const go_back_n) {
     return go_back_n <= 0 ? 0 : (current_byte - go_back_n) % 256;
 }
 
@@ -58,7 +59,7 @@ sub(x) = [curr_byte - bpp] mod 256
 bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
 */
-void Scanline::sub() {
+void Filter::sub() {
     for (size_t i = 0; i < _width; ++i) {
         for (size_t j = 0; j < _height; ++j) {
             int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
@@ -67,7 +68,7 @@ void Scanline::sub() {
     }
 }
 
-int Scanline::upf(int const current_byte, int const prior) {
+int Filter::upf(int const current_byte, int const prior) {
     return current_byte < prior ? current_byte - prior + 256: current_byte - prior;
 }
 
@@ -75,7 +76,7 @@ int Scanline::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-void Scanline::up() {
+void Filter::up() {
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
             int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
@@ -90,13 +91,13 @@ floor() = round to the smallest whole int
 bpp = see header
 prior(x) = previous scanline byte = [i - 1][j] 
 */
-int Scanline::avgf(int const current_byte, int const prior, int const go_back_n) {
+int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
     int diff = (current_byte - (int)std::floor((go_back_n + prior) / 2)); 
     return  diff < 0 ? diff + 256 : diff;
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
-void Scanline::avg() {
+void Filter::avg() {
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
             int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
@@ -113,7 +114,7 @@ a = raw(x - bpp) // left of current byte
 b = prior(x)     
 c = prior(x-bpp)
 */
-int Scanline::paethf(int const up, int const left, int const top_left) {
+int Filter::paethf(int const up, int const left, int const top_left) {
     int init_est          = up + left - top_left;
     int current_distance  = std::abs(init_est - up);
     int left_distance     = std::abs(init_est - left);
@@ -128,7 +129,7 @@ int Scanline::paethf(int const up, int const left, int const top_left) {
     }
 }
 
-void Scanline::paeth() {
+void Filter::paeth() {
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
             int left     = j < _bpp ? 0 : _old_img[i][j - _bpp];          // check if left is valid
@@ -137,5 +138,30 @@ void Scanline::paeth() {
 
             _new_img[i][j] = _old_img[i][j] - paethf(up, left, top_left);
         }
+    }
+}
+
+/*
+ideas:
+pass in 2 std::array<unsigned char> references, one top, other bottom. Then return the array
+pass in the full scanline as a reference, but we have to track other rigerminrole stuff
+*/
+void Filter::filter_scanline(std::vector<std::vector<unsigned char>>& scanline, std::vector<std::vector<unsigned char>>& new_img, int const current_width, int const current_height, int const max_height, int const go_back_n) {
+    std::vector<std::vector<unsigned char>> temp;
+
+    // this allocates an empty row
+    for (int i = 0; i < 4; ++i) {
+        temp[i].push_back({});
+    }
+
+    /*
+    1. subf
+    2. upf
+    3. avgf
+    4. paethf
+    */
+    for (int i = 0; i < max_height; ++i) {
+        temp[0].push_back(subf(scanline[current_width][current_height],
+                                     scanline[current_width][current_height - go_back_n]));
     }
 }

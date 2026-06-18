@@ -1,4 +1,4 @@
-#include "scanline.hpp"
+#include "filter.hpp"
 #include "image_processor.hpp"
 #include <fstream>
 #include <memory>
@@ -6,7 +6,7 @@
 #include <assert.h>
 
 void test_subf() {
-    Scanline sn;
+    Filter sn;
 
     std::cout << "testing subf()...\n";
 
@@ -54,7 +54,7 @@ void test_subf() {
 }
 
 void test_sub() {
-    Scanline sn;
+    Filter sn;
     Image    img;
 
     std::string str = "./photos/car.ppm"; 
@@ -66,8 +66,8 @@ void test_sub() {
     sn.print_new_img();
 }
 
-void test_scanline() {
-    Scanline sn;
+void test_Filter() {
+    Filter sn;
     Image    img;
 
     std::string str = "./photos/car.ppm"; 
@@ -91,7 +91,7 @@ void test_scanline() {
 }
 
 void test_upf() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photos/car.ppm";
@@ -151,7 +151,7 @@ void test_upf() {
 }
 
 void test_up() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photos/car.ppm";
@@ -168,7 +168,7 @@ void test_up() {
 }
 
 void test_avgf() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photo/hills.ppm";
@@ -294,7 +294,7 @@ void test_avgf() {
 }
 
 void test_avg() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photos/car.ppm";
@@ -311,7 +311,7 @@ void test_avg() {
 }
 
 void test_paethf() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photo/hills.ppm";
@@ -485,7 +485,7 @@ void test_paethf() {
 }
 
 void test_paeth() {
-    Scanline sn;
+    Filter sn;
     Image img;
 
     std::string str = "./photos/car.ppm";
@@ -502,7 +502,7 @@ void test_paeth() {
 }
 
 int main() {
-    test_scanline();
+    test_Filter();
     
     // test sub function and algorithm
     // test_sub();

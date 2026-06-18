@@ -1,5 +1,5 @@
-#ifndef SCANLINE_HPP
-#define SCANLINE_HPP
+#ifndef FILTER_HPP
+#define FILTER_HPP
 
 #include <cstddef>
 #include <fstream>
@@ -11,7 +11,7 @@
 
 // this should be renamed to filter
 
-class Scanline {
+class Filter {
     private:
         u_int8_t type; // 1 = grayscal  e, 2 = RGB, 3 = RGBA
         std::vector<std::vector<unsigned char>> _new_img;
@@ -33,8 +33,8 @@ class Scanline {
         bpp    = # of bytes per pixel complete, rounding up to one (channel x bit_depth) / 8
         */
         public:
-        Scanline() {};
-        Scanline(size_t width, size_t height, size_t channel, size_t bit_depth) : _width(width), _height(height), _channel(channel), _bit_depth(bit_depth) {};
+        Filter() {};
+        Filter(size_t width, size_t height, size_t channel, size_t bit_depth) : _width(width), _height(height), _channel(channel), _bit_depth(bit_depth) {};
         void allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream); // allocates vector
         void filter();
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
@@ -44,6 +44,7 @@ class Scanline {
         void up();
         void avg();
         void paeth();
+        void filter_scanline(std::vector<std::vector<unsigned char>>& scanline, std::vector<std::vector<unsigned char>>& new_img, int const current_width, int const current_height, int const max_height, int const go_back_n);
         
         // subf prolly needs to to priv or just needs to be seperated into it's own func rather than it being owned by a class
         int subf(int const current_byte, int const go_back_n); // the math func for sub
