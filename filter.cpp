@@ -59,12 +59,17 @@ sub(x) = [curr_byte - bpp] mod 256
 bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
 */
-void Filter::sub() {
-    for (size_t i = 0; i < _width; ++i) {
-        for (size_t j = 0; j < _height; ++j) {
-            int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
-            _new_img[i][j] = subf((int)_old_img[i][j], go_back_n);
-        }
+void Filter::sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
+    // for (size_t i = 0; i < _width; ++i) {
+    //     for (size_t j = 0; j < _height; ++j) {
+    //         int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
+    //         _new_img[i][j] = subf((int)_old_img[i][j], go_back_n);
+    //     }
+    // }
+
+    for (size_t i = 0; i < ARR_SIZE; ++i) {
+        int prev = (i < _bpp) ? 0 : bottom[i - _bpp];
+        subv[i] = subf((int)bottom[i], prev);
     }
 }
 
@@ -76,12 +81,16 @@ int Filter::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-void Filter::up() {
-    for (int i = 0; i < _width; ++i) {
-        for (int j = 0; j < _height; ++j) {
-            int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
-            _new_img[i][j] = upf((int)_old_img[i][j], prior);
-        }
+void Filter::up(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
+    // for (int i = 0; i < _width; ++i) {
+    //     for (int j = 0; j < _height; ++j) {
+    //         int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
+    //         _new_img[i][j] = upf((int)_old_img[i][j], prior);
+    //     }
+    // }
+
+    for (int i = 0; i < ARR_SIZE; ++i) {
+        subv[i] = upf((int)bottom[i], top[i]);
     }
 }
 
@@ -146,13 +155,12 @@ ideas:
 pass in 2 std::array<unsigned char> references, one top, other bottom. Then return the array
 pass in the full scanline as a reference, but we have to track other rigerminrole stuff
 */
-void Filter::filter_scanline(std::vector<std::vector<unsigned char>>& scanline, std::vector<std::vector<unsigned char>>& new_img, int const current_width, int const current_height, int const max_height, int const go_back_n) {
-    std::vector<std::vector<unsigned char>> temp;
-
-    // this allocates an empty row
-    for (int i = 0; i < 4; ++i) {
-        temp[i].push_back({});
-    }
+void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE) {
+    // preallocate 
+    std::vector<unsigned char> subv(ARR_SIZE);
+    std::vector<unsigned char> upv(ARR_SIZE);
+    std::vector<unsigned char> avgv(ARR_SIZE);
+    std::vector<unsigned char> paethv(ARR_SIZE);
 
     /*
     1. subf
@@ -160,8 +168,6 @@ void Filter::filter_scanline(std::vector<std::vector<unsigned char>>& scanline, 
     3. avgf
     4. paethf
     */
-    for (int i = 0; i < max_height; ++i) {
-        temp[0].push_back(subf(scanline[current_width][current_height],
-                                     scanline[current_width][current_height - go_back_n]));
-    }
+
+
 }

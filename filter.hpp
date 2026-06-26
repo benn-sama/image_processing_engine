@@ -40,11 +40,11 @@ class Filter {
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
         
         // algorithms
-        void sub();
-        void up();
+        void sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
+        void up(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
         void avg();
         void paeth();
-        void filter_scanline(std::vector<std::vector<unsigned char>>& scanline, std::vector<std::vector<unsigned char>>& new_img, int const current_width, int const current_height, int const max_height, int const go_back_n);
+        void filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE);
         
         // subf prolly needs to to priv or just needs to be seperated into it's own func rather than it being owned by a class
         int subf(int const current_byte, int const go_back_n); // the math func for sub
