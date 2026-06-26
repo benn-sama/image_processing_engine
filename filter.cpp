@@ -81,7 +81,7 @@ int Filter::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-void Filter::up(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
+void Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE) {
     // for (int i = 0; i < _width; ++i) {
     //     for (int j = 0; j < _height; ++j) {
     //         int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
@@ -106,7 +106,7 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
-void Filter::avg() {
+void Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
     for (int i = 0; i < _width; ++i) {
         for (int j = 0; j < _height; ++j) {
             int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
@@ -114,6 +114,12 @@ void Filter::avg() {
             
             _new_img[i][j] = avgf((int)_old_img[i][j], prior, go_back_n);
         }
+    }
+
+    for (int i = 0; i < ARR_SIZE; ++i) {
+       int prev = (i < _bpp) ? 0 : top[i];
+
+       avg
     }
 }
 

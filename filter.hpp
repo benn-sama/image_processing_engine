@@ -1,6 +1,7 @@
 #ifndef FILTER_HPP
 #define FILTER_HPP
 
+#include <array>
 #include <cstddef>
 #include <fstream>
 #include <random>
@@ -41,8 +42,8 @@ class Filter {
         
         // algorithms
         void sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
-        void up(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
-        void avg();
+        void up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE);
+        void avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE );
         void paeth();
         void filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE);
         
