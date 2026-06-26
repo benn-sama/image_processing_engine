@@ -81,7 +81,7 @@ int Filter::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-void Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE) {
+void Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& subv, int const ARR_SIZE) {
     // for (int i = 0; i < _width; ++i) {
     //     for (int j = 0; j < _height; ++j) {
     //         int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
@@ -107,19 +107,19 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 
 // this is identical to up's algorithm (prolly can do something about it)
 void Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
-    for (int i = 0; i < _width; ++i) {
-        for (int j = 0; j < _height; ++j) {
-            int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
-            int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
+    // for (int i = 1; i < _width; ++i) {
+    //     for (int j = 1; j < _height; ++j) {
+    //         int prior = i <= 1 ? 0 : (int)_old_img[i - 1][j];
+    //         int go_back_n = (j < _bpp) ? 1 : _old_img[i][j - _bpp];
             
-            _new_img[i][j] = avgf((int)_old_img[i][j], prior, go_back_n);
-        }
-    }
+    //         _new_img[i][j] = avgf((int)_old_img[i][j], prior, go_back_n);
+    //     }
+    // }
 
     for (int i = 0; i < ARR_SIZE; ++i) {
        int prev = (i < _bpp) ? 0 : top[i];
 
-       avg
+       avgv[i] = avgf(bottom[i], top[i], prev);
     }
 }
 
@@ -135,7 +135,7 @@ int Filter::paethf(int const up, int const left, int const top_left) {
     int left_distance     = std::abs(init_est - left);
     int top_left_distance = std::abs(init_est - top_left);
 
-    if (current_distance <= left_distance && up <= top_left_distance) {
+    if (current_distance <= left_distance && current_distance <= top_left_distance) {
         return up;
     } else if (left_distance <= top_left_distance) {
         return left;
@@ -144,15 +144,23 @@ int Filter::paethf(int const up, int const left, int const top_left) {
     }
 }
 
-void Filter::paeth() {
-    for (int i = 0; i < _width; ++i) {
-        for (int j = 0; j < _height; ++j) {
-            int left     = j < _bpp ? 0 : _old_img[i][j - _bpp];          // check if left is valid
-            int up       = i < 1 ? 0 : _old_img[i - 1][j];
-            int top_left = (i < 1 || j < 1) ? 0 : _old_img[i - 1][j - 1]; // check if top left is valid
+void Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE) {
+    // for (int i = 0; i < _width; ++i) {
+    //     for (int j = 0; j < _height; ++j) {
+    //         int left     = j < _bpp ? 0 : _old_img[i][j - _bpp];          // check if left is valid
+    //         int up       = i < 1 ? 0 : _old_img[i - 1][j];
+    //         int top_left = (i < 1 || j < 1) ? 0 : _old_img[i - 1][j - 1]; // check if top left is valid
 
-            _new_img[i][j] = _old_img[i][j] - paethf(up, left, top_left);
-        }
+    //         _new_img[i][j] = _old_img[i][j] - paethf(up, left, top_left);
+    //     }
+    // }
+
+    for (int i = 0; i < ARR_SIZE; ++i) {
+        int left     = i < _bpp ? 0 : (int)bottom[i];
+        int up       = (int)top[i];
+        int top_left = i < 0 ? 0 : (int)top[i - 1];
+        
+        paethv[i] = bottom[i] - paethf(up, left, top_left); 
     }
 }
 
@@ -174,6 +182,8 @@ void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsign
     3. avgf
     4. paethf
     */
-
-
+    sub(bottom, subv, ARR_SIZE);
+    up(bottom, top, upv, ARR_SIZE);
+    avg(bottom, top, avgv, ARR_SIZE);
+    paeth(bottom, top, paethv, ARR_SIZE);
 }

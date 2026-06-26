@@ -22,8 +22,7 @@ class Filter {
         size_t _height    = 0;
         size_t _channel   = 0; // this needs to be dynamic, 3 = RGB, how many channels
         size_t _bit_depth = 0; // how many bits in one channel
-        // size_t _bpp       = (_channel * _bit_depth) / 8;
-        size_t _bpp = 3;
+        size_t _bpp       = 4;
 
         /*
         sub(x) = raw(x) - raw(x - bpp)
@@ -35,7 +34,7 @@ class Filter {
         */
         public:
         Filter() {};
-        Filter(size_t width, size_t height, size_t channel, size_t bit_depth) : _width(width), _height(height), _channel(channel), _bit_depth(bit_depth) {};
+        Filter(size_t width, size_t height, size_t channel, size_t bit_depth) : _width(width), _height(height), _channel(channel), _bit_depth(bit_depth) { _bpp = (_channel * _bit_depth) / 8; };
         void allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream); // allocates vector
         void filter();
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
@@ -44,7 +43,7 @@ class Filter {
         void sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
         void up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE);
         void avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE );
-        void paeth();
+        void paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE);
         void filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE);
         
         // subf prolly needs to to priv or just needs to be seperated into it's own func rather than it being owned by a class
