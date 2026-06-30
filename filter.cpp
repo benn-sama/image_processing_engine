@@ -50,8 +50,15 @@ void Filter::verify(size_t const width, size_t const height, long const offset, 
     buffer_stream->seekg(offset, std::ios::beg);
 }
 
+// this can be written better but i'm lazy lol
 int Filter::subf(int const current_byte, int const go_back_n) {
-    return go_back_n <= 0 ? 0 : (current_byte - go_back_n) % 256;
+    int diff = current_byte - go_back_n;
+
+    if (diff < 0) {
+        return diff + 256;
+    } else {
+        return diff % 256;
+    }
 }
 
 /*

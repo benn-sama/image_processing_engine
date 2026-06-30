@@ -25,7 +25,7 @@ int main() {
         }
     };
     
-    test_case("subf(10, 0) short-circuit", filter.subf(10, 0), 0);
+    test_case("subf(10, 0) short-circuit", filter.subf(10, 0), 10);
     test_case("subf(10, 3)", filter.subf(10, 3), 7);
     test_case("subf(3, 3)", filter.subf(3, 3), 0);
     test_case("subf(0, 1) underflow", filter.subf(0, 1), 255);  // -1 mod 256 = 255

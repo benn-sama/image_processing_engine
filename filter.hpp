@@ -39,7 +39,7 @@ class Filter {
         void filter();
         void verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream);
         
-        // algorithms
+        // algorithms for compressions specifically
         void sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE);
         void up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE);
         void avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE );
