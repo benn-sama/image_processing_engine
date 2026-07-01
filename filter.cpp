@@ -9,7 +9,7 @@
 #include <vector>
 
 Filter::Filter(size_t const channel, size_t const bit_depth) {
-    
+   _bpp = (channel * bit_depth) / 8; 
 }
 
 // this can be written better but i'm lazy lol

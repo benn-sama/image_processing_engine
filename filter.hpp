@@ -14,7 +14,7 @@
 
 class Filter {
     private:
-        size_t _bpp       = 4;
+        size_t _bpp = 0;
 
         /*
         sub(x) = raw(x) - raw(x - bpp)
@@ -40,23 +40,6 @@ class Filter {
         int upf(int const current_byte, int const prior);
         int avgf(int const current_byte, int const prior, int const go_back_n);
         int paethf(int const up, int const left, int const top_left);
-
-        // this needs to be deleted  in the future (this is for testing purposes only )
-        void print_new_img() {
-            for (int i = 0; i < _width; ++i) {
-                for (int j = 0; j < _height; ++j) {
-                    std::cout << "[" << i << "]" << "[" << j << "]" << " = " << (int)_new_img[i][j] << std::endl; 
-                }
-            }
-        };
-
-        void print_old_img() {
-            for (int i = 0; i < _width; ++i) {
-                for (int j = 0; j < _height; ++j) {
-                    std::cout << "[" << i << "]" << "[" << j << "]" << " = " << (int)_old_img[i][j] << std::endl;
-                }
-            }
-        }
 };
 
 #endif
