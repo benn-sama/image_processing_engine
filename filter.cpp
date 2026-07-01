@@ -8,46 +8,8 @@
 #include <cmath>
 #include <vector>
 
-// this shouldn't assume that it is offset, must fix later
-void Filter::allocate(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
-    std::unique_ptr buffer = std::make_unique<char[]>(1);
-    _width  = width;
-    _height = height;
+Filter::Filter(size_t const channel, size_t const bit_depth) {
     
-    // w = 2268, h = 4032
-    std::cout << "width: " << width << std::endl << "height: " << height << std::endl;
-
-    // stores the the old img, just in case for later
-    // allocates new img, so we don't have to allocate memory, since it will always be allocated already
-    for (size_t i = 0; i < width; ++i) {
-        _old_img.push_back({}); // create a row before accessing
-        _new_img.push_back({});
-        for (size_t j = 0; j < height; ++j) {
-            buffer_stream->read(buffer.get(), 1);
-            _old_img[i].push_back(buffer[0]);
-            _new_img[i].push_back(buffer[0]);
-            // std::cout << "pushed: " << "[" << i << "]" << "[" << j << "]" << " = " << (int)_old_img[i][j] << std::endl;
-        }
-    }
-    
-    // points ptr to the offset 
-    buffer_stream->seekg(offset, std::ios::beg);
-}
-
-void Filter::verify(size_t const width, size_t const height, long const offset, std::fstream* buffer_stream) {
-    std::unique_ptr buffer = std::make_unique<char[]>(1);
-
-    for (size_t i = 0; i < width; ++i) {
-        for (size_t j = 0; j < height; ++j) {
-            buffer_stream->read(buffer.get(), 1);
-            if (_old_img[i][j] != (u_int8_t)buffer[0]) {
-                // std::cout << "[" << i << "]" << "[" << j << "] " << " = " << (int)_old_img[i][j] << " != " << (u_int8_t)buffer[0] << std::endl;
-                exit(1);
-            }
-        }
-    }
-
-    buffer_stream->seekg(offset, std::ios::beg);
 }
 
 // this can be written better but i'm lazy lol
@@ -67,13 +29,6 @@ bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
 */
 void Filter::sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
-    // for (size_t i = 0; i < _width; ++i) {
-    //     for (size_t j = 0; j < _height; ++j) {
-    //         int go_back_n = (j < _bpp) ? 0 : _old_img[i][j - _bpp];
-    //         _new_img[i][j] = subf((int)_old_img[i][j], go_back_n);
-    //     }
-    // }
-
     for (size_t i = 0; i < ARR_SIZE; ++i) {
         int prev = (i < _bpp) ? 0 : bottom[i - _bpp];
         subv[i] = subf((int)bottom[i], prev);
@@ -89,13 +44,6 @@ up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
 void Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& subv, int const ARR_SIZE) {
-    // for (int i = 0; i < _width; ++i) {
-    //     for (int j = 0; j < _height; ++j) {
-    //         int prior = i <= 0 ? 0 : (int)_old_img[i - 1][j];
-    //         _new_img[i][j] = upf((int)_old_img[i][j], prior);
-    //     }
-    // }
-
     for (int i = 0; i < ARR_SIZE; ++i) {
         subv[i] = upf((int)bottom[i], top[i]);
     }
@@ -114,15 +62,6 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 
 // this is identical to up's algorithm (prolly can do something about it)
 void Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
-    // for (int i = 1; i < _width; ++i) {
-    //     for (int j = 1; j < _height; ++j) {
-    //         int prior = i <= 1 ? 0 : (int)_old_img[i - 1][j];
-    //         int go_back_n = (j < _bpp) ? 1 : _old_img[i][j - _bpp];
-            
-    //         _new_img[i][j] = avgf((int)_old_img[i][j], prior, go_back_n);
-    //     }
-    // }
-
     for (int i = 0; i < ARR_SIZE; ++i) {
        int prev = (i < _bpp) ? 0 : top[i];
 
@@ -152,16 +91,6 @@ int Filter::paethf(int const up, int const left, int const top_left) {
 }
 
 void Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE) {
-    // for (int i = 0; i < _width; ++i) {
-    //     for (int j = 0; j < _height; ++j) {
-    //         int left     = j < _bpp ? 0 : _old_img[i][j - _bpp];          // check if left is valid
-    //         int up       = i < 1 ? 0 : _old_img[i - 1][j];
-    //         int top_left = (i < 1 || j < 1) ? 0 : _old_img[i - 1][j - 1]; // check if top left is valid
-
-    //         _new_img[i][j] = _old_img[i][j] - paethf(up, left, top_left);
-    //     }
-    // }
-
     for (int i = 0; i < ARR_SIZE; ++i) {
         int left     = i < _bpp ? 0 : (int)bottom[i];
         int up       = (int)top[i];
