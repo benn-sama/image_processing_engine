@@ -1,4 +1,5 @@
 #include "filter.hpp"
+
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -8,6 +9,7 @@
 #include <sys/types.h>
 #include <cmath>
 #include <vector>
+#include <limits>
 
 Filter::Filter(size_t const channel, size_t const bit_depth) {
    _bpp = (channel * bit_depth) / 8; 
@@ -29,18 +31,18 @@ sub(x) = [curr_byte - bpp] mod 256
 bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
 */
-int Filter::sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
-    int max = 0;
+int Filter::sub(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+    int sum = 0;
     int sub = 0;
     
     for (size_t i = 1; i < ARR_SIZE; ++i) {
         int prev = (i < _bpp) ? 0 : bottom[i - _bpp];
         sub      = subf((int)bottom[i], prev);
-        subv[i]  = sub;
-        max     += sub;
+        filtersv[1][i]  = sub;
+        sum     += sub;
     }
 
-    return max;
+    return sum / ARR_SIZE;
 }
 
 int Filter::upf(int const current_byte, int const prior) {
@@ -51,17 +53,17 @@ int Filter::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-int Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE) {
-    int max = 0;
+int Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+    int sum = 0;
     int up  = 0;
     
     for (int i = 1; i < ARR_SIZE; ++i) {
         up     = upf((int)bottom[i], top[i]); 
-        upv[i] = up;
-        max   += up;
+        filtersv[2][i] = up;
+        sum   += up;
     }
 
-    return max;
+    return sum / ARR_SIZE;
 }
 
 /*
@@ -76,19 +78,19 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
-int Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
-    int max = 0;
+int Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+    int sum = 0;
     int avg = 0;
 
     for (int i = 1; i < ARR_SIZE; ++i) {
        int prev = (i < _bpp) ? 0 : top[i];
 
        avg     = avgf(bottom[i], top[i], prev);
-       avgv[i] = avg;
-       max    += avg;
+       filtersv[3][i] = avg;
+       sum    += avg;
     }
 
-    return max;
+    return sum / ARR_SIZE;
 }
 
 /*
@@ -112,8 +114,8 @@ int Filter::paethf(int const up, int const left, int const top_left) {
     }
 }
 
-int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE) {
-    int max   = 0;
+int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+    int sum   = 0;
     int paeth = 0;
 
     for (int i = 1; i < ARR_SIZE; ++i) {
@@ -122,37 +124,64 @@ int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>
         int top_left = i < 0 ? 0 : (int)top[i - 1];
         
         paeth     = bottom[i] - paethf(up, left, top_left); 
-        paethv[i] = paeth; 
-        max      += paeth;
+        filtersv[4][i] = paeth; 
+        sum      += paeth;
     }
     
-    return max;
+    return sum / ARR_SIZE;
 }
 
+
+int Filter::none(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+    int sum = 0;
+
+    for (int i = 1; i < ARR_SIZE; ++i) {
+        filtersv[4][i] = bottom[i];
+        sum += filtersv[0][i];
+    }
+
+    return sum / ARR_SIZE;
+}
 /*
 ideas:
 pass in 2 std::array<unsigned char> references, one top, other bottom. Then return the array
 pass in the full scanline as a reference, but we have to track other rigerminrole stuff
 */
+
 void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE) {
     // preallocate 
-    std::vector<unsigned char> subv(ARR_SIZE + 1);
-    std::vector<unsigned char> upv(ARR_SIZE + 1);
-    std::vector<unsigned char> avgv(ARR_SIZE + 1);
-    std::vector<unsigned char> paethv(ARR_SIZE + 1);
+    int VEC_SIZE = ARR_SIZE + 1;
+    std::array<int, 5>         dumb_arr;
 
-    subv.push_back(1);
-    upv.push_back(2);
-    avgv.push_back(3);
-    paethv.push_back(4);
+    std::vector<std::vector<unsigned char>> filtersv(VEC_SIZE, std::vector<unsigned char>(5));
+
+    filtersv[0].push_back(0);
+    filtersv[1].push_back(1);
+    filtersv[2].push_back(2);
+    filtersv[3].push_back(3);
+    filtersv[4].push_back(4);
+
     /*
     1. subf
     2. upf
     3. avgf
     4. paethf
     */
-    sub(bottom, subv, ARR_SIZE);
-    up(bottom, top, upv, ARR_SIZE);
-    avg(bottom, top, avgv, ARR_SIZE);
-    paeth(bottom, top, paethv, ARR_SIZE);
+    dumb_arr[0] = none(bottom, filtersv, ARR_SIZE);
+    dumb_arr[1] = sub(bottom, filtersv, ARR_SIZE);
+    dumb_arr[2] = up(bottom, top, filtersv, ARR_SIZE);
+    dumb_arr[3] = avg(bottom, top, filtersv, ARR_SIZE);
+    dumb_arr[4] = paeth(bottom, top, filtersv, ARR_SIZE);
+
+    int max = dumb_arr[0];
+
+    for (int i = 1; i < 5; ++i) {
+        if (max < dumb_arr[i]) {
+            max = dumb_arr[i];
+        }
+    }
+
+    for (int i = 0; i < VEC_SIZE; ++i) {
+        alter[i] = filtersv[max][i];
+    }
 }
