@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <fstream>
+#include <ranges>
 #include <sys/types.h>
 #include <cmath>
 #include <vector>
@@ -28,11 +29,18 @@ sub(x) = [curr_byte - bpp] mod 256
 bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
 */
-void Filter::sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
-    for (size_t i = 0; i < ARR_SIZE; ++i) {
+int Filter::sub(std::vector<unsigned char>& bottom, std::vector<unsigned char>& subv, int const ARR_SIZE) {
+    int max = 0;
+    int sub = 0;
+    
+    for (size_t i = 1; i < ARR_SIZE; ++i) {
         int prev = (i < _bpp) ? 0 : bottom[i - _bpp];
-        subv[i] = subf((int)bottom[i], prev);
+        sub      = subf((int)bottom[i], prev);
+        subv[i]  = sub;
+        max     += sub;
     }
+
+    return max;
 }
 
 int Filter::upf(int const current_byte, int const prior) {
@@ -43,10 +51,17 @@ int Filter::upf(int const current_byte, int const prior) {
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
 */
-void Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& subv, int const ARR_SIZE) {
-    for (int i = 0; i < ARR_SIZE; ++i) {
-        subv[i] = upf((int)bottom[i], top[i]);
+int Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& upv, int const ARR_SIZE) {
+    int max = 0;
+    int up  = 0;
+    
+    for (int i = 1; i < ARR_SIZE; ++i) {
+        up     = upf((int)bottom[i], top[i]); 
+        upv[i] = up;
+        max   += up;
     }
+
+    return max;
 }
 
 /*
@@ -61,12 +76,19 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
-void Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
-    for (int i = 0; i < ARR_SIZE; ++i) {
+int Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& avgv, int const ARR_SIZE) {
+    int max = 0;
+    int avg = 0;
+
+    for (int i = 1; i < ARR_SIZE; ++i) {
        int prev = (i < _bpp) ? 0 : top[i];
 
-       avgv[i] = avgf(bottom[i], top[i], prev);
+       avg     = avgf(bottom[i], top[i], prev);
+       avgv[i] = avg;
+       max    += avg;
     }
+
+    return max;
 }
 
 /*
@@ -90,14 +112,21 @@ int Filter::paethf(int const up, int const left, int const top_left) {
     }
 }
 
-void Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE) {
-    for (int i = 0; i < ARR_SIZE; ++i) {
+int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<unsigned char>& paethv, int const ARR_SIZE) {
+    int max   = 0;
+    int paeth = 0;
+
+    for (int i = 1; i < ARR_SIZE; ++i) {
         int left     = i < _bpp ? 0 : (int)bottom[i];
         int up       = (int)top[i];
         int top_left = i < 0 ? 0 : (int)top[i - 1];
         
-        paethv[i] = bottom[i] - paethf(up, left, top_left); 
+        paeth     = bottom[i] - paethf(up, left, top_left); 
+        paethv[i] = paeth; 
+        max      += paeth;
     }
+    
+    return max;
 }
 
 /*
@@ -107,11 +136,15 @@ pass in the full scanline as a reference, but we have to track other rigerminrol
 */
 void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE) {
     // preallocate 
-    std::vector<unsigned char> subv(ARR_SIZE);
-    std::vector<unsigned char> upv(ARR_SIZE);
-    std::vector<unsigned char> avgv(ARR_SIZE);
-    std::vector<unsigned char> paethv(ARR_SIZE);
+    std::vector<unsigned char> subv(ARR_SIZE + 1);
+    std::vector<unsigned char> upv(ARR_SIZE + 1);
+    std::vector<unsigned char> avgv(ARR_SIZE + 1);
+    std::vector<unsigned char> paethv(ARR_SIZE + 1);
 
+    subv.push_back(1);
+    upv.push_back(2);
+    avgv.push_back(3);
+    paethv.push_back(4);
     /*
     1. subf
     2. upf
