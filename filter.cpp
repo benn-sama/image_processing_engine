@@ -136,18 +136,20 @@ int Filter::none(std::vector<unsigned char>& bottom, std::vector<std::vector<uns
     int sum = 0;
 
     for (int i = 1; i < ARR_SIZE; ++i) {
-        filtersv[4][i] = bottom[i];
-        sum += filtersv[0][i];
+        filtersv[0][i] = bottom[i];
+        sum += bottom[i];
     }
 
     return sum / ARR_SIZE;
 }
 /*
-ideas:
-pass in 2 std::array<unsigned char> references, one top, other bottom. Then return the array
-pass in the full scanline as a reference, but we have to track other rigerminrole stuff
-*/
+What it does:
+ This is an adaptive filtering method, this chooses the filter with the least sum.
+ This attempts to maximize compression by choosing the least sum.
 
+ NOTE:
+    - ASSUME scanline is CURR_ARRAY_SIZE + 1. First byte notes which filter is being chosen for that scanline
+*/
 void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE) {
     // preallocate 
     int VEC_SIZE = ARR_SIZE + 1;
@@ -155,11 +157,11 @@ void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsign
 
     std::vector<std::vector<unsigned char>> filtersv(VEC_SIZE, std::vector<unsigned char>(5));
 
-    filtersv[0].push_back(0);
-    filtersv[1].push_back(1);
-    filtersv[2].push_back(2);
-    filtersv[3].push_back(3);
-    filtersv[4].push_back(4);
+    filtersv[0][0] = 0;
+    filtersv[1][0] = 1;
+    filtersv[2][0] = 2;
+    filtersv[3][0] = 3;
+    filtersv[4][0] = 4;
 
     /*
     1. subf
@@ -173,15 +175,24 @@ void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsign
     dumb_arr[3] = avg(bottom, top, filtersv, ARR_SIZE);
     dumb_arr[4] = paeth(bottom, top, filtersv, ARR_SIZE);
 
-    int max = dumb_arr[0];
+    std::cout << "none:   " << dumb_arr[0] << std::endl
+              << "sub:    " << dumb_arr[1] << std::endl
+              << "up:     " << dumb_arr[2] << std::endl
+              << "avg:    " << dumb_arr[3] << std::endl
+              << "paeth:  " << dumb_arr[4] << std::endl;
 
+    // chooses which scanline has the least sum 
+    int least = dumb_arr[0];
+    int pos   = 0;
     for (int i = 1; i < 5; ++i) {
-        if (max < dumb_arr[i]) {
-            max = dumb_arr[i];
+        if (least > dumb_arr[i]) {
+            least = dumb_arr[i];
+            pos = i;
         }
     }
 
+    // overwrites alter with the choses scanline
     for (int i = 0; i < VEC_SIZE; ++i) {
-        alter[i] = filtersv[max][i];
+        alter[i] = filtersv[pos][i];
     }
 }
