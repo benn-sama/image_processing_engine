@@ -33,16 +33,16 @@ void LZ77::parse() {
 /*
  * Dynamic LZ77 algorithm
  */
-void LZ77::compress() {
+void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE) {
     size_t       current_index           = 0;
-    size_t       search_window_tail      = MAX_WINDOW_SIZE;
-    size_t       search_window_len = 8;
+    size_t       search_window_tail      = ARR_SIZE < MAX_WINDOW_SIZE ? ARR_SIZE : MAX_WINDOW_SIZE;
+    size_t       search_window_len       = 8;
     std::unordered_map<std::string, int, string_hash, std::equal_to<>> map;
 
     // actual lz77 compression methods
-    while (current_index < size_t(buffer.size())) {
+    while (current_index < ARR_SIZE) {
         for (; current_index < search_window_tail; ++current_index) {
-            std::string_view viewPackage(reinterpret_cast<const char*>(buffer.data()) + current_index, std::min(search_window_len, buffer.size()));
+            std::string_view viewPackage(data_stream[current_index], std::min(search_window_len, buffer.size()));
             
             auto it = map.find(viewPackage);
             if (it == map.end()) {
@@ -56,7 +56,7 @@ void LZ77::compress() {
         }
 
         // quick check if current search window length can support that last numbers
-        if (search_window_tail + MAX_WINDOW_SIZE <= size_t(buffer.size())) {
+        if (search_window_tail + MAX_WINDOW_SIZE <= ARR_SIZE) {
             search_window_tail += MAX_WINDOW_SIZE;
         } else {
             search_window_tail += (size_t(buffer.size()) - search_window_tail);

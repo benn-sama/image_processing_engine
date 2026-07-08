@@ -32,14 +32,15 @@ struct Data {
 // allows string view to allocate a string
 struct string_hash {
     using is_transparent = void; // opt-in marker
-    size_t operator()(std::string_view sv)  const { return std::hash<std::string_view>{}(sv); }
-    size_t operator()(const std::string& s) const { return std::hash<std::string_view>{}(s); }
-    size_t operator()(const char* s)        const { return std::hash<std::string_view>{}(s);}
+    size_t operator()(std::string_view sv)          const { return std::hash<std::string_view>{}(sv); }
+    size_t operator()(const std::string& s)         const { return std::hash<std::string_view>{}(s); }
+    size_t operator()(const char* s)                const { return std::hash<std::string_view>{}(s);}
+    size_t operator()(std::vector<unsigned char> s) const { return std::hash<std::string_view>{}(s);}
 };
 
 class LZ77 {
     private:
-        static constexpr size_t MAX_WINDOW_SIZE = 64;     // window size of the LZ77 window
+        static constexpr int MAX_WINDOW_SIZE = 8000;     // window size of the LZ77 window = 8KB
 
         u_int16_t length = 1;
     
@@ -51,7 +52,7 @@ class LZ77 {
     public:
         LZ77();
         void parse(); // file content is split into unsigned chars
-        void compress();
+        void compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE);
         void compress2();
         void print();
         void printE();
