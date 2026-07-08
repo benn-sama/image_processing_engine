@@ -27,15 +27,8 @@ struct Data {
     }
 };
 
-// 258 matchingWindowSize
-struct alignas(4096) Package {
-    std::array<u_int8_t, 32768> window; // 32 * 1024 = 32KB
-    size_t currentIndex = 0;
-    
-    std::unordered_map<std::string, u_int8_t> map;
 
-};
-
+// this needs to pass reference a string rather than opening a string
 // allows string view to allocate a string
 struct string_hash {
     using is_transparent = void; // opt-in marker
@@ -45,14 +38,15 @@ struct string_hash {
 };
 
 class LZ77 {
-    static constexpr size_t MAX_WINDOW_SIZE = 64;     // window size of the LZ77 window
+    private:
+        static constexpr size_t MAX_WINDOW_SIZE = 64;     // window size of the LZ77 window
 
-    u_int16_t length = 1;
+        u_int16_t length = 1;
     
-    std::ifstream file{"story.txt"};
-    std::vector<unsigned char> buffer;         // the thing being scanned
-    std::vector<Data> cData;
-    std::array<u_int8_t, 64> window; // 32768
+        std::ifstream file{"story.txt"};
+        std::vector<unsigned char> buffer;         // the thing being scanned
+        std::vector<Data> cData;
+        std::array<u_int8_t, 64> window; // 32768
 
     public:
         LZ77();

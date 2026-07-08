@@ -8,31 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
-// bit packing is cool, but only works if all the bytes fit in one single string. 
-// for our use case, it is useless
-// /*
-//  * This will pack the bytes, into one single 32x
-//  */
-// u_int32_t pack(unsigned char a, unsigned char b, unsigned char c, unsigned char d) {
-//     return (u_int32_t)a << 24 
-//          | (u_int32_t)b << 16
-//          | (u_int32_t)c << 8
-//          | (u_int32_t)d; 
-// }
-
-// // shifts bits to the left and assigns newByte into 
-// void enqueue(u_int32_t& package, unsigned char newByte) {
-//     package = (package << 8) | newByte; // shifts by 8, then 'appends' new byte to 0-8
-// }
-
-// this is here for reference
-// void dequeue(u_int32_t& package) {
-//     // unsigned char byte = (unsigned char)(package >> 24); 
-//     package <<= 8; // this joint shifts to out of bounds and drops the furthest left
-// }
 
 LZ77::LZ77() {}
-
 
 /*
 This parses the data
@@ -79,7 +56,6 @@ void LZ77::compress() {
         }
 
         // quick check if current search window length can support that last numbers
-        std::cout << search_window_tail + MAX_WINDOW_SIZE  << ":" << size_t(buffer.size()) << std::endl;  
         if (search_window_tail + MAX_WINDOW_SIZE <= size_t(buffer.size())) {
             search_window_tail += MAX_WINDOW_SIZE;
         } else {
@@ -87,6 +63,7 @@ void LZ77::compress() {
             search_window_len  = search_window_tail;
         }
 
+        // restarts the hash map
         map.clear();
     }
 }
