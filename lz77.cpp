@@ -37,19 +37,17 @@ void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE)
     size_t       current_index           = 0;
     size_t       search_window_tail      = ARR_SIZE < MAX_WINDOW_SIZE ? ARR_SIZE : MAX_WINDOW_SIZE;
     size_t       search_window_len       = 8;
-    std::unordered_map<std::string, int, string_hash, std::equal_to<>> map;
-
+    std::pmr::unordered_map<unsigned char, Token> map;
+    
     // actual lz77 compression methods
     while (current_index < ARR_SIZE) {
         for (; current_index < search_window_tail; ++current_index) {
-            std::string_view viewPackage(data_stream[current_index], std::min(search_window_len, buffer.size()));
-            
-            auto it = map.find(viewPackage);
-            if (it == map.end()) {
-                map.emplace(std::string(viewPackage), current_index);
-                cData.emplace_back(current_index, 0, 0, buffer[current_index + 1]);
+            auto it = map.find(data_stream[current_index]);
+            if (it == map.end()) { // not found
+                map.emplace(data_stream[current_index], Token{});
+                tokens.emplace_back(current_index, 0, 0, buffer[current_index + 1]);
             } else {
-                cData.emplace_back(Data{(u_int8_t)current_index, u_int8_t(current_index - it->second), 8, buffer[current_index + 1]});
+                cData.emplace_back(Token{});//(u_int8_t)current_index, u_int8_t(current_index - it->second), 8, buffer[current_index + 1]});
                 map.emplace(viewPackage, current_index);
                 current_index += 7;
             }

@@ -16,26 +16,25 @@
 #include <iostream>
 #include <sstream>
 
-struct Data {
-    u_int8_t index;
-    u_int8_t pos;
-    u_int8_t len;
-    u_int8_t code;
+struct Token {
+    bool is_match;
+
+    union {
+        u_int8_t literal;
+
+        struct {
+            u_int8_t position;
+            u_int8_t length;
+        } match;
+    };
 
     void print() {
-        std::cout << (int)index << "<" << (int)pos << ", " << (int)len << ">" << (unsigned char)code << std::endl;
+        if (is_match) {
+            std::cout << "<" << (int)match.position << ", " << (int)match.length << ">" << (unsigned char)literal << std::endl;
+        } else {
+            std::cout << (unsigned char)literal << '\n';
+        }
     }
-};
-
-
-// this needs to pass reference a string rather than opening a string
-// allows string view to allocate a string
-struct string_hash {
-    using is_transparent = void; // opt-in marker
-    size_t operator()(std::string_view sv)          const { return std::hash<std::string_view>{}(sv); }
-    size_t operator()(const std::string& s)         const { return std::hash<std::string_view>{}(s); }
-    size_t operator()(const char* s)                const { return std::hash<std::string_view>{}(s);}
-    size_t operator()(std::vector<unsigned char> s) const { return std::hash<std::string_view>{}(s);}
 };
 
 class LZ77 {
@@ -46,7 +45,7 @@ class LZ77 {
     
         std::ifstream file{"story.txt"};
         std::vector<unsigned char> buffer;         // the thing being scanned
-        std::vector<Data> cData;
+        std::vector<Token> tokens;
         std::array<u_int8_t, 64> window; // 32768
 
     public:
