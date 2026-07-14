@@ -37,6 +37,17 @@ struct Token {
     }
 };
 
+u_int32_t package_bytes(std::vector<unsigned char>& data_stream, int const START_POS, int const OFFSET) {
+    u_int32_t package = 0;
+
+    for (int i = START_POS; i < START_POS + OFFSET; ++i) {
+        package <<= 8;
+        package |= static_cast<u_int32_t>(data_stream[i]);
+    }
+
+    return package;
+}
+
 class LZ77 {
     private:
         static constexpr int MAX_WINDOW_SIZE = 8000;     // window size of the LZ77 window = 8KB
