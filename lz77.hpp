@@ -20,11 +20,11 @@ struct Token {
     bool is_match;
 
     union {
-        u_int8_t literal;
+        u_int32_t literal;
 
         struct {
-            u_int8_t position;
-            u_int8_t length;
+            u_int8_t position = 0;
+            u_int8_t length   = 0;
         } match;
     };
 
@@ -45,7 +45,7 @@ class LZ77 {
     
         std::ifstream file{"story.txt"};
         std::vector<unsigned char> buffer;         // the thing being scanned
-        std::vector<Token> tokens;
+        std::vector<Token> token_buffer;
         std::array<u_int8_t, 64> window; // 32768
 
     public:
