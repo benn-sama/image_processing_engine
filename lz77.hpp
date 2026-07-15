@@ -23,8 +23,8 @@ struct Token {
         u_int32_t literal;
 
         struct {
-            u_int8_t position = 0;
-            u_int8_t length   = 0;
+            u_int16_t position = 0;
+            u_int8_t  length   = 0;
         } match;
     };
 
@@ -36,17 +36,6 @@ struct Token {
         }
     }
 };
-
-u_int32_t package_bytes(std::vector<unsigned char>& data_stream, int const START_POS, int const OFFSET) {
-    u_int32_t package = 0;
-
-    for (int i = START_POS; i < START_POS + OFFSET; ++i) {
-        package <<= 8;
-        package |= static_cast<u_int32_t>(data_stream[i]);
-    }
-
-    return package;
-}
 
 class LZ77 {
     private:
@@ -66,6 +55,16 @@ class LZ77 {
         void compress2();
         void print();
         void printE();
+        u_int32_t package_bytes(std::vector<unsigned char>& data_stream, int const START_POS, int const OFFSET) {
+            u_int32_t package = 0;
+
+            for (int i = START_POS; i < START_POS + OFFSET; ++i) {
+                package <<= 8;
+                package |= static_cast<u_int32_t>(data_stream[i]);
+            }
+
+            return package;
+        }
 };
 
 #endif

@@ -60,15 +60,26 @@ void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE)
     size_t head = 0;
     size_t tail = 4;
     size_t window_end = ARR_SIZE < MAX_WINDOW_SIZE ? ARR_SIZE : MAX_WINDOW_SIZE;
-    std::unordered_map<u_int32_t, Token> map;
-    
+    std::unordered_map<u_int32_t, size_t> map;
+
+    auto emit_literal = [&]() {
+       token_buffer.emplace_back(Token{.is_match = false, .literal = data_stream[head]});
+       ++head; 
+    };
+
     // actual lz77 compression methods
     // NOTE: need to take account for the offset
     while (head < ARR_SIZE) {
         for (; head < window_end; ++head) {
-            int length = window_end - head;
-            if (length < 4) {
-                head = length;
+            // int length = window_end - head;
+            // if (length < 4) {
+            //     head = length;
+            // }
+            
+            // checks if there is any remaining bytes in which can't fit in the package
+            if ((size_t) ARR_SIZE - head < 4) { 
+                emit_literal(); 
+                continue;
             }
 
             u_int32_t package = package_bytes(data_stream, head, length);
