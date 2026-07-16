@@ -58,62 +58,46 @@ void LZ77::parse() {
  */
 void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE) {
     size_t head = 0;
-    size_t tail = 4;
-    size_t window_end = ARR_SIZE < MAX_WINDOW_SIZE ? ARR_SIZE : MAX_WINDOW_SIZE;
     std::unordered_map<u_int32_t, size_t> map;
 
+    // proceeds to get one byte at a time
     auto emit_literal = [&]() {
        token_buffer.emplace_back(Token{.is_match = false, .literal = data_stream[head]});
        ++head; 
     };
 
-    // actual lz77 compression methods
-    // NOTE: need to take account for the offset
-    while (head < ARR_SIZE) {
-        for (; head < window_end; ++head) {
-            // int length = window_end - head;
-            // if (length < 4) {
-            //     head = length;
-            // }
-            
-            // checks if there is any remaining bytes in which can't fit in the package
-            if ((size_t) ARR_SIZE - head < 4) { 
-                emit_literal(); 
-                continue;
-            }
+    // actual lz77 compression method
+    while (head < (size_t)ARR_SIZE) {
+        // gets the remaining bytes at the end of the sliding window
+        if ((size_t)ARR_SIZE - head < 4) { 
+            emit_literal(); 
+            continue;
+        }
 
-            u_int32_t package = package_bytes(data_stream, head, length);
-            auto it = map.find(package);
-            Token new_token = Token{.is_match = true, .literal = package};
+        u_int32_t package = package_bytes(data_stream, head, 4);
+        auto it = map.find(package);
 
-            // checks if Token already exists in the hashmap
-            if (it == map.end()) { // not found
-                new_token.is_match = false;
-                map.emplace(new_token.literal, new_token);
-                token_buffer.emplace_back(new_token);
-            } else { // found
-                // initialize new values
-                new_token.match.position = head - it->second.match.position;
-                new_token.match.length   = length; // default value always
-
-                map.emplace(new_token.literal, new_token);
-                token_buffer.emplace_back(new_token);//(u_int8_t)current_index, u_int8_t(current_index - it->second), 8, buffer[current_index + 1]});
-                if (length > 4) {
-                    head += 3;
-                }
+        // walks the found chain to find the next largest repetitive sequence
+        size_t match_len = 0;
+        if (it != map.end() && head - it->second <= (size_t)MAX_WINDOW_SIZE) {
+            size_t max_len = std::min((size_t)ARR_SIZE - head, (size_t)32768);
+            while (match_len < max_len && data_stream[it->second + match_len] == data_stream[head + match_len] && match_len < 258) {
+                ++match_len;
             }
         }
 
-        // quick check if current search window length can support that last numbers
-        if (window_end + MAX_WINDOW_SIZE <= ARR_SIZE) {
-            window_end += MAX_WINDOW_SIZE;
-        } else {
-            window_end += ARR_SIZE - window_end;
-            tail = window_end;
-        }
+        size_t prev_pos = (it != map.end()) ? it->second : 0;
+        map[package] = head; // always update to the most recent pos
 
-        // restarts the hash map
-        map.clear();
+        if (match_len < 4) { emit_literal(); continue; }
+
+        // build the repetitive token
+        Token t{};
+        t.is_match = true;
+        t.match.position = (u_int16_t)(head - prev_pos);
+        t.match.length   = (u_int16_t)match_len;
+        token_buffer.emplace_back(t);
+        head += match_len;
     }
 }
 

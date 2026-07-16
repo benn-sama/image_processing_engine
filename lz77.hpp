@@ -24,7 +24,7 @@ struct Token {
 
         struct {
             u_int16_t position = 0;
-            u_int8_t  length   = 0;
+            u_int16_t  length   = 0;
         } match;
     };
 
@@ -39,16 +39,16 @@ struct Token {
 
 class LZ77 {
     private:
-        static constexpr int MAX_WINDOW_SIZE = 8000;     // window size of the LZ77 window = 8KB
 
         u_int16_t length = 1;
     
         std::ifstream file{"story.txt"};
         std::vector<unsigned char> buffer;         // the thing being scanned
-        std::vector<Token> token_buffer;
-        std::array<u_int8_t, 64> window; // 32768
+        std::array<u_int8_t, 32768> window; // 32768
 
     public:
+        std::vector<Token> token_buffer;
+        static constexpr int MAX_WINDOW_SIZE = 32768;     // window size of the LZ77 window = 8KB
         LZ77();
         void parse(); // file content is split into unsigned chars
         void compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE);
