@@ -59,7 +59,6 @@ void LZ77::parse() {
 void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE) {
     size_t head = 0;
     std::unordered_map<u_int32_t, size_t> map;
-
     // proceeds to get one byte at a time
     auto emit_literal = [&]() {
        token_buffer.emplace_back(Token{.is_match = false, .literal = data_stream[head]});
@@ -80,7 +79,7 @@ void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE)
         // walks the found chain to find the next largest repetitive sequence
         size_t match_len = 0;
         if (it != map.end() && head - it->second <= (size_t)MAX_WINDOW_SIZE) {
-            size_t max_len = std::min((size_t)ARR_SIZE - head, (size_t)32768);
+            size_t max_len = std::min((size_t)ARR_SIZE - head, (size_t)32768); // checks for overflow
             while (match_len < max_len && data_stream[it->second + match_len] == data_stream[head + match_len] && match_len < 258) {
                 ++match_len;
             }
