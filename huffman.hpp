@@ -2,6 +2,8 @@
 #define HUFFMAN_HPP
 
 #include <sys/types.h>
+#include <unordered_map>
+#include "lz77.hpp"
 
 typedef struct {
     u_int16_t base;
@@ -37,14 +39,71 @@ static constexpr CodeEntry dist_table[30] = {
 };
 
 struct Code {
-    u_int8_t literal;
+    u_int8_t  code_len;
+    u_int16_t code;
+};
 
+// token_hash.hpp
+//
+// Token has no operator== or std::hash<Token>, which is why
+// std::unordered_map<Token, int> fails to instantiate. Add these
+// wherever Token is defined (or #include this file before huffman.hpp
+// and before Token is ever used as a map/set key).
+//
+// Semantics chosen:
+//   - Two tokens are only equal if is_match matches.
+//   - If is_match == false, compare by `literal`.
+//   - If is_match == true, compare by (position, length).
+// This avoids reading the inactive union member (reading `literal`
+// while `match` is active, or vice versa, is technically UB even
+// though it "works" on most compilers).
+
+#pragma once
+#include <functional>
+
+inline bool operator==(const Token& a, const Token& b) {
+    if (a.is_match != b.is_match) {
+        return false;
+    }
+    if (a.is_match) {
+        return a.match.position == b.match.position &&
+               a.match.length   == b.match.length;
+    }
+    return a.literal == b.literal;
+}
+
+namespace std {
+    template<>
+    struct hash<Token> {
+        size_t operator()(const Token& t) const noexcept {
+            size_t h;
+            if (t.is_match) {
+                size_t h1 = std::hash<u_int16_t>{}(t.match.position);
+                size_t h2 = std::hash<u_int16_t>{}(t.match.length);
+                h = h1 ^ (h2 * 0x9e3779b97f4a7c15ULL + 0x1);
+            } else {
+                h = std::hash<u_int32_t>{}(t.literal);
+            }
+            // fold in is_match so a match and a literal can never collide
+            // into "equal" territory even if their bit patterns match
+            return h ^ (static_cast<size_t>(t.is_match) << 1);
+        }
+    };
+}
+
+struct TokenC {
+    Token token;
+    int   count = 0;
 };
 
 class Huffman {
     private:
-
     public:
+        std::unordered_map<Token, int> byte_counter;
+        std::array<
+        Huffman() {};
+        void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
+        void extract_count(std::vector<TokenC>& tokens);
 };
 
 #endif

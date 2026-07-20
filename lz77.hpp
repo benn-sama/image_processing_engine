@@ -47,12 +47,10 @@ class LZ77 {
         std::array<u_int8_t, 32768> window; // 32768
 
     public:
-        std::vector<Token> token_buffer;
         static constexpr int MAX_WINDOW_SIZE = 32768;     // window size of the LZ77 window = 8KB
         LZ77();
         void parse(); // file content is split into unsigned chars
-        void compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE);
-        void compress2();
+        void compress(std::vector<unsigned char>& data_stream, std::vector<Token> token_buffer, int const ARR_SIZE);
         void print();
         void printE();
         u_int32_t package_bytes(std::vector<unsigned char>& data_stream, int const START_POS, int const OFFSET) {

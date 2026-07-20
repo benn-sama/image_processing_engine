@@ -2,11 +2,11 @@ CXX := g++
 CXXFLAGS := -std=c++20 -Wall -Wextra -O2
 
 # test-lz.cpp and test_scanline.cpp removed — they have their own main() and are built separately
-SRC := main.cpp thread.cpp thread_pool.cpp random_num_gen.cpp image_processor.cpp lz77.cpp filter.cpp greyscale.cpp
+SRC := main.cpp thread.cpp thread_pool.cpp random_num_gen.cpp image_processor.cpp lz77.cpp filter.cpp greyscale.cpp huffman.cpp
 OBJ := $(SRC:.cpp=.o)
 TARGET := main
 
-.PHONY: all run-main run-lztest run-sltest clean
+.PHONY: all run-main run-lztest run-sltest run-huffmantest clean
 
 all: $(TARGET)
 
@@ -36,5 +36,15 @@ test-scanline: test_scanline.o filter.o image_processor.o greyscale.o
 run-sltest: test-scanline
 	./test-scanline
 
+# Huffman test depends on huffman + lz77 + image_processor + greyscale
+test_huffman.o: test_huffman.cpp lz77.hpp image_processor.hpp greyscale.hpp huffman.hpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+test-huffman: test_huffman.o huffman.o lz77.o image_processor.o greyscale.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+run-huffmantest: test-huffman
+	./test-huffman
+
 clean:
-	rm -f $(TARGET) $(OBJ) test-lz test-lz.o test-scanline test_scanline.o
+	rm -f $(TARGET) $(OBJ) test-lz test-lz.o test-scanline test_scanline.o test-huffman test_huffman.o

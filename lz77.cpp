@@ -56,7 +56,7 @@ void LZ77::parse() {
  * NOTE:
  * Assume 4 byte hash chain
  */
-void LZ77::compress(std::vector<unsigned char>& data_stream, int const ARR_SIZE) {
+void LZ77::compress(std::vector<unsigned char>& data_stream, std::vector<Token> token_buffer, int const ARR_SIZE) {
     size_t head = 0;
     std::unordered_map<u_int32_t, size_t> map;
     // proceeds to get one byte at a time
