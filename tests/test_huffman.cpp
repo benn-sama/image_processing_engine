@@ -24,7 +24,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include "huffman.hpp"
+#include "../huffman.hpp"
 
 // ---------------------------------------------------------------------
 // Helpers to build fake Token data

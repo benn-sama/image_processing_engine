@@ -1,4 +1,4 @@
-#include "lz77.hpp"
+#include "../lz77.hpp"
 #include <sys/types.h>
 #include <cassert>
 

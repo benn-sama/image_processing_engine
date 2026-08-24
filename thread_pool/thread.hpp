@@ -8,7 +8,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "random_num_gen.cpp"
+#include "../random_num_gen.cpp"
 
 extern int total_working;       // in main thread: if n threads are working, wait for at LEAST 1 to finish
 
