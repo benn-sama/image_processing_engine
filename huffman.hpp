@@ -72,6 +72,7 @@ inline bool operator==(const Token& a, const Token& b) {
     return a.literal == b.literal;
 }
 
+// this junk is to allow hashing of Token struct with union
 namespace std {
     template<>
     struct hash<Token> {
@@ -100,6 +101,7 @@ class Huffman {
     private:
     public:
         std::unordered_map<Token, int> byte_counter;
+
         Huffman() {};
         void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
         void extract_count(std::vector<TokenC>& tokens);
