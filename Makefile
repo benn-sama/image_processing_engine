@@ -1,20 +1,19 @@
 CXX      := g++
 CXXFLAGS := -std=c++20 -Wall -Wextra -O2
 
-SRC_FILES  := filter.o greyscale.o huffman.o image_processor.o lz77.o main.o pngt.o random_num_gen.o ./thread_pool/thread_pool.o ./thread_pool/thread.o
-TEST_FILES := test_huffman.o test_scanline.o test-lz.o test.o
+SRC_FILES    		:= filter.o greyscale.o huffman.o image_processor.o lz77.o main.o pngt.o random_num_gen.o ./thread_pool/thread_pool.o ./thread_pool/thread.o
+TEST_FILES   	    := tests/test_huffman.o tests/test_scanline.o tests/test-lz.o tests/test.o
+TEST_FILES_COMPILED := $(TEST_FILES:.o=)
 
+# compiles everything, assuming no tests
 all: $(SRC_FILES)
 	$(CXX) $(CXXFLAGS) $^ -o main
 
-test: $(TEST_FILES) $(SRC_FILES)
-	$(CXX) $(CXXFLAGS) $^ -o tests
+# compiles everything INCLUDING tests
+tests: $(SRC_FILES) $(TEST_FILES) $(TEST_FILES_COMPILED)
 
 run-main: all
 	./main
-
-run-tests: test
-	./test
 
 $(SRC_FILES): %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
@@ -22,6 +21,15 @@ $(SRC_FILES): %.o: %.cpp
 $(TEST_FILES): %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
+$(TEST_FILES_COMPILED): tests/%: tests/%.o
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# these are to reference the .o
+tests/test_huffman: huffman.o
+tests/test_scanline: filter.o
+tests/test-lz: lz77.o
+
+# obviously this is to clean up nasty compiled files
 clean:
 	rm -f *.o main test & rm -f ./thread_pool/*.o & rm -f ./tests/*.o
 
