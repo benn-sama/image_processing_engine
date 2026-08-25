@@ -100,11 +100,13 @@ struct TokenC {
 class Huffman {
     private:
     public:
-        std::unordered_map<Token, int> byte_counter;
-
+        std::unordered_map<Token,int> byte_counter;
+        
         Huffman() {};
         void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
         void extract_count(std::vector<TokenC>& tokens);
+
+        void decompose(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
 };
 
 #endif
