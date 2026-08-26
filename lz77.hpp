@@ -40,7 +40,7 @@ struct Token {
 class LZ77 {
     private:
 
-        u_int16_t length = 1;
+        u_int8_t length = 1;
     
         std::ifstream file{"story.txt"};
         std::vector<unsigned char> buffer;         // the thing being scanned

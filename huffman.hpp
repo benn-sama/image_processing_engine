@@ -1,6 +1,7 @@
 #ifndef HUFFMAN_HPP
 #define HUFFMAN_HPP
 
+#include <cstdint>
 #include <sys/types.h>
 #include <unordered_map>
 #include "lz77.hpp"
@@ -42,6 +43,26 @@ struct Code {
     u_int8_t  code_len;
     u_int16_t code;
 };
+
+typedef struct {
+    u_int16_t code;
+    u_int16_t len;
+    u_int16_t min;
+    u_int16_t max;
+} Length_To_Code;
+
+static constexpr Length_To_Code len_table[29] {
+    {257,0,3,3},     {258,0,4,4},     {259,0,5,5},     {260,0,6,6},
+    {261,0,7,7},     {262,0,8,8},     {263,0,9,9},     {264,0,10,10},
+    {265,1,11,12},   {266,1,13,14},   {267,1,15,16},   {268,1,17,18},
+    {269,2,19,22},   {270,2,23,26},   {271,2,27,30},   {272,2,31,34},
+    {273,3,35,42},   {274,3,43,50},   {275,3,51,58},   {276,3,59,66},
+    {277,4,67,82},   {278,4,83,98},   {279,4,99,114},  {280,4,115,130},
+    {281,5,131,162}, {282,5,163,194}, {283,5,195,226}, {284,5,227,257}, // <-- capped at 257, not 258!
+    {285,0,258,258}
+};
+
+static constexpr u_int8_t TABLE_SIZE = 29;
 
 // token_hash.hpp
 //
@@ -101,12 +122,24 @@ class Huffman {
     private:
     public:
         std::unordered_map<Token,int> byte_counter;
-        
-        Huffman() {};
-        void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
-        void extract_count(std::vector<TokenC>& tokens);
+        // counts the occurence of literal and length
+        // NOTE: all ranges are inclusive
+        // literal             = 0-255
+        // end of block marker = 256
+        // length              = 257-285
+        std::array<u_int16_t, 286> lit_len_counter;
+        // counts the occurence of distance (pairs only)
+        // NOTE: all ranges are inclusive
+        // distance                         = 0-29
+        // included but probably never seen = 30-31
+        std::array<u_int16_t, 32>  dist_counter;
 
-        void decompose(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
+        Huffman() {};
+        // void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
+        // void extract_count(std::vector<TokenC>& tokens);
+
+        void count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
+        u_int16_t get_code(u_int16_t const length);
 };
 
 #endif
