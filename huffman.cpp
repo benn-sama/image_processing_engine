@@ -2,27 +2,6 @@
 #include "lz77.hpp"
 #include <sys/types.h>
 
-// // counts the occurrence of each byte in &buffer_stream
-// void Huffman::count(std::vector<Token>& buffer_stream, int const STREAM_SIZE) {
-//     for (int i = 0; i < STREAM_SIZE; ++i) {
-//         auto it = byte_counter.find(buffer_stream[i]);
-
-//         if (it != byte_counter.end()) {
-//             ++it->second;
-//         } else {
-//             byte_counter.emplace(buffer_stream[i], 1);
-//         }
-//     }
-// }
-
-// // extracts tokens with count occurrence
-// void Huffman::extract_count(std::vector<TokenC>& tokens) {
-//     tokens.reserve(byte_counter.size());
-//     for (const auto& [key, value] : byte_counter) {
-//         tokens.push_back(TokenC{key, value});
-//     }
-// }
-
 /*
 What this methods does:
   This counts the total occurences of literals that appear in buffer_stream and then add EOB (End Of Block)
@@ -55,6 +34,14 @@ u_int16_t Huffman::count_occurrences(std::vector<Token>& buffer_stream, int cons
     return 0;
 }
 
+/*
+What this does:
+  This is ONLY used WHEN a LZ77 pair is the current element.
+  This will find where that length appears in the length map using a min max range and return that CODE.
+  From length 3-258 (inclusive) can be mapped.
+  
+  Returns 259 IF it is out of range. (P.S. This shouldn't return 259 ever because LZ77 needs to make sure length is in between 3-258 inclusive)
+*/
 u_int16_t Huffman::get_code(u_int16_t const length) {
     for (int i = 0; i < TABLE_SIZE; ++i) {
         if (length >= len_table[i].min && length <= len_table[i].max) {
@@ -65,6 +52,11 @@ u_int16_t Huffman::get_code(u_int16_t const length) {
     return 259;
 }
 
+/*
+What this does:
+  This should be ran AFTER Huffman coding is COMPLETELY Finished
+  This zeros ALL THE ARRAYS to prepare it for the next Block stream
+*/
 void Huffman::zero_all() {
     for (int &element : lit_len_counter) {
         element = 0;

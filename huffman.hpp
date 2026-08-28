@@ -93,26 +93,6 @@ inline bool operator==(const Token& a, const Token& b) {
     return a.literal == b.literal;
 }
 
-// this junk is to allow hashing of Token struct with union
-namespace std {
-    template<>
-    struct hash<Token> {
-        size_t operator()(const Token& t) const noexcept {
-            size_t h;
-            if (t.is_match) {
-                size_t h1 = std::hash<u_int16_t>{}(t.match.position);
-                size_t h2 = std::hash<u_int16_t>{}(t.match.length);
-                h = h1 ^ (h2 * 0x9e3779b97f4a7c15ULL + 0x1);
-            } else {
-                h = std::hash<u_int32_t>{}(t.literal);
-            }
-            // fold in is_match so a match and a literal can never collide
-            // into "equal" territory even if their bit patterns match
-            return h ^ (static_cast<size_t>(t.is_match) << 1);
-        }
-    };
-}
-
 struct TokenC {
     Token token;
     int   count = 0;
@@ -121,7 +101,6 @@ struct TokenC {
 class Huffman {
     private:
     public:
-        std::unordered_map<Token,int> byte_counter;
         // counts the occurence of literal and length
         // NOTE: all ranges are inclusive
         // literal             = 0-255
