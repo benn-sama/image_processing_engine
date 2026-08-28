@@ -20,7 +20,7 @@ struct Token {
     bool is_match;
 
     union {
-        u_int32_t literal;
+        u_int8_t literal;
 
         struct {
             u_int16_t position = 0;

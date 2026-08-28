@@ -127,7 +127,7 @@ class Huffman {
         // literal             = 0-255
         // end of block marker = 256
         // length              = 257-285
-        std::array<u_int16_t, 286> lit_len_counter;
+        std::array<int, 286> lit_len_counter = {};
         // counts the occurence of distance (pairs only)
         // NOTE: all ranges are inclusive
         // distance                         = 0-29
@@ -138,8 +138,9 @@ class Huffman {
         // void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
         // void extract_count(std::vector<TokenC>& tokens);
 
-        void count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
+        u_int16_t count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
         u_int16_t get_code(u_int16_t const length);
+        void zero_all();
 };
 
 #endif

@@ -40,18 +40,19 @@ What this methods does:
 
   When it counts all elements in buffer_stream, append an EOB in 256.
 */
-void Huffman::count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE) {
+u_int16_t Huffman::count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE) {
     for (int i = 0; i < STREAM_SIZE; ++i) {
         if (!buffer_stream[i].is_match) {
             ++lit_len_counter[buffer_stream[i].literal];
         } else {
-            u_int16_t code = get_code(buffer_stream[i].literal);
-            if (code == 259) { return; } // there was an error in get_code()
+            u_int16_t code = get_code(buffer_stream[i].match.length);
+            if (code == 259) { return code; }
             ++lit_len_counter[code];
         }
     }
 
-    ++lit_len_counter[256];
+    lit_len_counter[256] = 1;
+    return 0;
 }
 
 u_int16_t Huffman::get_code(u_int16_t const length) {
@@ -62,4 +63,10 @@ u_int16_t Huffman::get_code(u_int16_t const length) {
     }
 
     return 259;
+}
+
+void Huffman::zero_all() {
+    for (int &element : lit_len_counter) {
+        element = 0;
+    }
 }
