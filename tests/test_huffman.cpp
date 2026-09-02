@@ -27,8 +27,8 @@ static void print_lit_len_counter(Huffman const& h) {
     std::cout << "  lit_len_counter (nonzero indices): ";
     bool any = false;
     for (size_t i = 0; i < h.lit_len_counter.size(); ++i) {
-        if (h.lit_len_counter[i] != 0) {
-            std::cout << "[" << i << "]=" << h.lit_len_counter[i] << " ";
+        if (h.lit_len_counter[i].total_occurence != 0) {
+            std::cout << "[" << i << "]=" << h.lit_len_counter[i].total_occurence << " ";
             any = true;
             if (any) { break; }
         }
@@ -63,8 +63,8 @@ void test_single_literal_increments_counter() {
     t.literal = 0x41;
     std::vector<Token> buf = {t};
     h.count_occurrences(buf, 1);
-    assert(h.lit_len_counter[0x41] == 1);
-    assert(h.lit_len_counter[256] == 1); // end-of-block marker always bumped once per call
+    assert(h.lit_len_counter[0x41].total_occurence == 1);
+    assert(h.lit_len_counter[256].total_occurence == 1); // end-of-block marker always bumped once per call
     print_debug_state(h, "test_single_literal_increments_counter");
     std::cout << "[COMPLETE] test_single_literal_increments_counter" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;
@@ -81,8 +81,8 @@ void test_multiple_occurrences_of_same_literal() {
 
     h.count_occurrences(buf, 3);
 
-    assert(h.lit_len_counter[0x7A] == 3);
-    assert(h.lit_len_counter[256] == 1);
+    assert(h.lit_len_counter[0x7A].total_occurence == 3);
+    assert(h.lit_len_counter[256].total_occurence == 1);
 
     print_debug_state(h, "test_multiple_occurrences_of_same_literal");
     std::cout << "[COMPLETE] test_multiple_occurrences_of_same_literal" << std::endl;
@@ -100,9 +100,9 @@ void test_distinct_literals_counted_separately() {
 
     h.count_occurrences(buf, 3);
 
-    assert(h.lit_len_counter[0x10] == 2);
-    assert(h.lit_len_counter[0x20] == 1);
-    assert(h.lit_len_counter[256] == 1);
+    assert(h.lit_len_counter[0x10].total_occurence == 2);
+    assert(h.lit_len_counter[0x20].total_occurence == 1);
+    assert(h.lit_len_counter[256].total_occurence == 1);
 
     print_debug_state(h, "test_distinct_literals_counted_separately");
     std::cout << "[COMPLETE] test_distinct_literals_counted_separately" << std::endl;
@@ -119,9 +119,9 @@ void test_literal_boundary_values() {
 
     h.count_occurrences(buf, 2);
 
-    assert(h.lit_len_counter[0] == 1);
-    assert(h.lit_len_counter[255] == 1);
-    assert(h.lit_len_counter[256] == 1);
+    assert(h.lit_len_counter[0].total_occurence == 1);
+    assert(h.lit_len_counter[255].total_occurence == 1);
+    assert(h.lit_len_counter[256].total_occurence == 1);
 
     print_debug_state(h, "test_literal_boundary_values");
     std::cout << "[COMPLETE] test_literal_boundary_values" << std::endl;
@@ -138,9 +138,9 @@ void test_empty_stream_still_increments_eob() {
 
     // Loop body never runs (STREAM_SIZE == 0), but the EOB increment sits
     // outside the loop and is unconditional, so it still fires once.
-    assert(h.lit_len_counter[256] == 1);
+    assert(h.lit_len_counter[256].total_occurence == 1);
     int total = 0;
-    for (auto v : h.lit_len_counter) total += v;
+    for (auto v : h.lit_len_counter) total += v.total_occurence;
     assert(total == 1);
 
     print_debug_state(h, "test_empty_stream_still_increments_eob");
@@ -185,11 +185,11 @@ void test_match_token_count_matches_get_code_output() {
         // get_code failed to resolve a bucket -> count_occurrences returns
         // early, before the EOB increment.
         int total = 0;
-        for (auto v : h.lit_len_counter) total += v;
+        for (auto v : h.lit_len_counter) total += v.total_occurence;
         assert(total == 0);
     } else {
-        assert(h.lit_len_counter[expected_code] == 1);
-        assert(h.lit_len_counter[256] == 1);
+        assert(h.lit_len_counter[expected_code].total_occurence == 1);
+        assert(h.lit_len_counter[256].total_occurence == 1);
     }
 
     print_debug_state(h, "test_match_token_count_matches_get_code_output");
@@ -231,11 +231,11 @@ void test_invalid_match_code_stops_processing_early() {
     print_debug_state(h, "test_invalid_match_code_stops_processing_early (after count_occurrences)");
 
     // Token processed before the error should be counted...
-    assert(h.lit_len_counter[0x41] == 1);
+    assert(h.lit_len_counter[0x41].total_occurence == 1);
     // ...but the function returns immediately on error, so nothing after
     // it runs, and the trailing EOB increment (after the loop) never fires.
-    assert(h.lit_len_counter[0x42] == 0);
-    assert(h.lit_len_counter[256] == 0);
+    assert(h.lit_len_counter[0x42].total_occurence == 0);
+    assert(h.lit_len_counter[256].total_occurence == 0);
 
     std::cout << "[COMPLETE] test_invalid_match_code_stops_processing_early" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;std::cout << "---------------------------------------------------------------------" << std::endl;
@@ -274,11 +274,57 @@ void test_debug_trace_mixed_stream() {
     // token hit the 259-error path, processing would have stopped early and
     // this still holds.
     int total_lit = 0;
-    for (size_t i = 0; i < h.lit_len_counter.size() - 1; ++i) total_lit += h.lit_len_counter[i];
+    for (size_t i = 0; i < h.lit_len_counter.size() - 1; ++i) total_lit += h.lit_len_counter[i].total_occurence;
     assert(total_lit <= static_cast<int>(buf.size()) + 1); // + 1 counts for the automatic incrementing EOB(256)
 
     std::cout << "[COMPLETE] test_debug_trace_mixed_stream" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;std::cout << "---------------------------------------------------------------------" << std::endl;
+}
+
+void test_sort() {
+    std::cout << "[STARTING] test_debug_trace_mixed_stream" << std::endl;
+
+    Huffman h;
+    std::vector<Token> buf;
+
+    Token lit1{}; lit1.is_match = false; lit1.literal = 0x61; // 'a' as raw byte
+    Token lit2{}; lit2.is_match = false; lit2.literal = 0x62; // 'b' as raw byte
+    Token match1{}; match1.is_match = true; match1.literal = 4; match1.match.position = 2; match1.match.length = 4;
+    Token lit3{}; lit3.is_match = false; lit3.literal = 0x61;
+
+    buf = {lit1, lit2, match1, lit3};
+
+    std::cout << "  input tokens:" << std::endl;
+    for (size_t i = 0; i < buf.size(); ++i) print_token(buf[i], i);
+    h.count_occurrences(buf, static_cast<int>(buf.size()));
+
+    for (size_t i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
+        std::cout << i << "-" << i + 1 << " -> " << h.lit_len_counter[i].total_occurence << " >= " << h.lit_len_counter[i + 1].total_occurence << std::endl;
+    }
+
+    std::cout << "Checking if object vector is sorted in ascending order...\n";
+    h.sort();
+    for (size_t i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
+        std::cout << i << "-" << i + 1 << " -> " << h.lit_len_counter[i].total_occurence << " >= " << h.lit_len_counter[i + 1].total_occurence << std::endl;
+        assert(h.lit_len_counter[i].total_occurence >= h.lit_len_counter[i + 1].total_occurence);
+    }
+    std::cout << "Object vector sort check SUCCESS\n";
+
+    std::cout << "[COMPLETE] test_debug_trace_mixed_stream" << std::endl;
+    std::cout << "---------------------------------------------------------------------" << std::endl;std::cout << "---------------------------------------------------------------------" << std::endl;
+}
+
+void test_element_id_preservation() {
+    Huffman h;
+
+    std::cout << "[STARTING] test_element_id_preservation" << std::endl;
+    
+    for (int i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
+        std::cout << i << " : " << i + 1 << std::endl;
+       assert(h.lit_len_counter[i].element_id < h.lit_len_counter[i + 1].element_id);
+    }
+
+    std::cout << "[COMPLETE] test_element_id_preservation" << std::endl;
 }
 
 int main() {
@@ -291,5 +337,7 @@ int main() {
     test_match_token_count_matches_get_code_output();
     test_invalid_match_code_stops_processing_early();
     test_debug_trace_mixed_stream();
+    test_sort();
+    test_element_id_preservation();
     return 0;
 }

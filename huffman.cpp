@@ -1,5 +1,6 @@
 #include "huffman.hpp"
 #include "lz77.hpp"
+#include <functional>
 #include <sys/types.h>
 
 /*
@@ -22,15 +23,16 @@ What this methods does:
 u_int16_t Huffman::count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE) {
     for (int i = 0; i < STREAM_SIZE; ++i) {
         if (!buffer_stream[i].is_match) {
-            ++lit_len_counter[buffer_stream[i].literal];
+            ++lit_len_counter[buffer_stream[i].literal].total_occurence;
         } else {
             u_int16_t code = get_code(buffer_stream[i].match.length);
             if (code == 259) { return code; }
-            ++lit_len_counter[code];
+            ++lit_len_counter[code].total_occurence;
         }
     }
 
-    lit_len_counter[256] = 1;
+    lit_len_counter[256].total_occurence = 1;
+
     return 0;
 }
 
@@ -58,7 +60,15 @@ What this does:
   This zeros ALL THE ARRAYS to prepare it for the next Block stream
 */
 void Huffman::zero_all() {
-    for (int &element : lit_len_counter) {
-        element = 0;
+    for (int i = 0; i < int(lit_len_counter.size()); ++i) {
+        lit_len_counter[i].total_occurence = 0;
     }
+}
+
+void Huffman::sort() {
+    // sort ascending order to start assigning actual code
+    std::sort(lit_len_counter.begin(), lit_len_counter.end(),
+             [](const Tally &a, const Tally &b) {
+                return a.total_occurence > b.total_occurence;
+             });
 }

@@ -5,6 +5,9 @@
 #include <sys/types.h>
 #include <unordered_map>
 #include "lz77.hpp"
+#include <algorithm>
+
+// make clean; make tests; ./tests/test_huffman
 
 typedef struct {
     u_int16_t base;
@@ -93,9 +96,21 @@ inline bool operator==(const Token& a, const Token& b) {
     return a.literal == b.literal;
 }
 
-struct TokenC {
-    Token token;
-    int   count = 0;
+/*
+This struct is design to hold to total number of occurence of at literal/length
+AND
+the element of it.
+
+Why?
+So we can keep track of the literal AND the occurence becuase the element_id represents a literal too
+*/
+struct Tally {
+    int total_occurence = 0;
+    int element_id = 0;
+
+    // underneath increments everytime a new instance is created
+    inline static int counter = 0;
+    Tally() : element_id(++counter) {}
 };
 
 class Huffman {
@@ -106,7 +121,7 @@ class Huffman {
         // literal             = 0-255
         // end of block marker = 256
         // length              = 257-285
-        std::array<int, 286> lit_len_counter = {};
+        std::array<Tally, 286> lit_len_counter = {};
         // counts the occurence of distance (pairs only)
         // NOTE: all ranges are inclusive
         // distance                         = 0-29
@@ -114,12 +129,10 @@ class Huffman {
         std::array<u_int16_t, 32>  dist_counter;
 
         Huffman() {};
-        // void count(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
-        // void extract_count(std::vector<TokenC>& tokens);
-
         u_int16_t count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
         u_int16_t get_code(u_int16_t const length);
         void zero_all();
+        void sort();
 };
 
 #endif
