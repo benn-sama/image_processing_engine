@@ -23,15 +23,15 @@ What this methods does:
 u_int16_t Huffman::count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE) {
     for (int i = 0; i < STREAM_SIZE; ++i) {
         if (!buffer_stream[i].is_match) {
-            ++lit_len_counter[buffer_stream[i].literal].total_occurence;
+            ++lit_len_counter_dupe[buffer_stream[i].literal].total_occurence;
         } else {
-            u_int16_t code = get_code(buffer_stream[i].match.length);
+            u_int16_t code = get_len_code(buffer_stream[i].match.length);
             if (code == 259) { return code; }
-            ++lit_len_counter[code].total_occurence;
+            ++lit_len_counter_dupe[code].total_occurence;
         }
     }
 
-    lit_len_counter[256].total_occurence = 1;
+    lit_len_counter_dupe[256].total_occurence = 1;
 
     return 0;
 }
@@ -44,8 +44,8 @@ What this does:
   
   Returns 259 IF it is out of range. (P.S. This shouldn't return 259 ever because LZ77 needs to make sure length is in between 3-258 inclusive)
 */
-u_int16_t Huffman::get_code(u_int16_t const length) {
-    for (int i = 0; i < TABLE_SIZE; ++i) {
+u_int16_t Huffman::get_len_code(u_int16_t const length) {
+    for (int i = 0; i < LEN_TABLE_SIZE; ++i) {
         if (length >= len_table[i].min && length <= len_table[i].max) {
             return len_table[i].code;
         }
@@ -56,19 +56,40 @@ u_int16_t Huffman::get_code(u_int16_t const length) {
 
 /*
 What this does:
-  This should be ran AFTER Huffman coding is COMPLETELY Finished
-  This zeros ALL THE ARRAYS to prepare it for the next Block stream
+  This is ONLY used WHEN LZ77 pair is the current element.
+  This will find where that distance appears in the distance map using min max range and return that CODE.
+
+  Returns 40000 IF it is our range. (P.S. This shouldn't return 40000 ever because it NEEDS to be in range)
 */
-void Huffman::zero_all() {
-    for (int i = 0; i < int(lit_len_counter.size()); ++i) {
-        lit_len_counter[i].total_occurence = 0;
+u_int16_t Huffman::get_dist_code(u_int16_t const distance) {
+    for (int i = 0; i < DIST_TABLE_SIZE; ++i) {
+        if (distance >= dist_table[i].min && distance <= dist_table[i].max) {
+            return dist_table[i].code;
+        }
+    }
+
+    return 40000;
+}
+
+/*
+What this does:
+  This should be ran AFTER Huffman coding is COMPLETELY Finished
+  This COMPLETELY RESETS lit_len_counter_dupe to be the original 
+*/
+void Huffman::reset_len_len_counter() {
+    for (int i = 0; i < int(lit_len_counter_dupe.size()); ++i) {
+        lit_len_counter_dupe[i] = lit_len_counter_actual[i];
     }
 }
 
 void Huffman::sort() {
     // sort ascending order to start assigning actual code
-    std::sort(lit_len_counter.begin(), lit_len_counter.end(),
+    std::sort(lit_len_counter_dupe.begin(), lit_len_counter_dupe.end(),
              [](const Tally &a, const Tally &b) {
                 return a.total_occurence > b.total_occurence;
              });
+}
+
+void generate_huffman_tree() {
+    
 }

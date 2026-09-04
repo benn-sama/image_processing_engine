@@ -23,12 +23,12 @@
 // state of a Huffman instance so failures (or just curiosity) can be
 // inspected without attaching a debugger.
 
-static void print_lit_len_counter(Huffman const& h) {
-    std::cout << "  lit_len_counter (nonzero indices): ";
+static void print_lit_len_counter_dupe(Huffman const& h) {
+    std::cout << "  lit_len_counter_dupe (nonzero indices): ";
     bool any = false;
-    for (size_t i = 0; i < h.lit_len_counter.size(); ++i) {
-        if (h.lit_len_counter[i].total_occurence != 0) {
-            std::cout << "[" << i << "]=" << h.lit_len_counter[i].total_occurence << " ";
+    for (size_t i = 0; i < h.lit_len_counter_dupe.size(); ++i) {
+        if (h.lit_len_counter_dupe[i].total_occurence != 0) {
+            std::cout << "[" << i << "]=" << h.lit_len_counter_dupe[i].total_occurence << " ";
             any = true;
             if (any) { break; }
         }
@@ -51,7 +51,7 @@ static void print_token(Token const& t, size_t idx) {
 
 static void print_debug_state(Huffman const& h, char const* label) {
     std::cout << "  -- " << label << " --" << std::endl;
-    print_lit_len_counter(h);
+    print_lit_len_counter_dupe(h);
 }
 
 void test_single_literal_increments_counter() {
@@ -63,8 +63,8 @@ void test_single_literal_increments_counter() {
     t.literal = 0x41;
     std::vector<Token> buf = {t};
     h.count_occurrences(buf, 1);
-    assert(h.lit_len_counter[0x41].total_occurence == 1);
-    assert(h.lit_len_counter[256].total_occurence == 1); // end-of-block marker always bumped once per call
+    assert(h.lit_len_counter_dupe[0x41].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 1); // end-of-block marker always bumped once per call
     print_debug_state(h, "test_single_literal_increments_counter");
     std::cout << "[COMPLETE] test_single_literal_increments_counter" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;
@@ -81,8 +81,8 @@ void test_multiple_occurrences_of_same_literal() {
 
     h.count_occurrences(buf, 3);
 
-    assert(h.lit_len_counter[0x7A].total_occurence == 3);
-    assert(h.lit_len_counter[256].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[0x7A].total_occurence == 3);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 1);
 
     print_debug_state(h, "test_multiple_occurrences_of_same_literal");
     std::cout << "[COMPLETE] test_multiple_occurrences_of_same_literal" << std::endl;
@@ -100,9 +100,9 @@ void test_distinct_literals_counted_separately() {
 
     h.count_occurrences(buf, 3);
 
-    assert(h.lit_len_counter[0x10].total_occurence == 2);
-    assert(h.lit_len_counter[0x20].total_occurence == 1);
-    assert(h.lit_len_counter[256].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[0x10].total_occurence == 2);
+    assert(h.lit_len_counter_dupe[0x20].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 1);
 
     print_debug_state(h, "test_distinct_literals_counted_separately");
     std::cout << "[COMPLETE] test_distinct_literals_counted_separately" << std::endl;
@@ -119,9 +119,9 @@ void test_literal_boundary_values() {
 
     h.count_occurrences(buf, 2);
 
-    assert(h.lit_len_counter[0].total_occurence == 1);
-    assert(h.lit_len_counter[255].total_occurence == 1);
-    assert(h.lit_len_counter[256].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[0].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[255].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 1);
 
     print_debug_state(h, "test_literal_boundary_values");
     std::cout << "[COMPLETE] test_literal_boundary_values" << std::endl;
@@ -138,9 +138,9 @@ void test_empty_stream_still_increments_eob() {
 
     // Loop body never runs (STREAM_SIZE == 0), but the EOB increment sits
     // outside the loop and is unconditional, so it still fires once.
-    assert(h.lit_len_counter[256].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 1);
     int total = 0;
-    for (auto v : h.lit_len_counter) total += v.total_occurence;
+    for (auto v : h.lit_len_counter_dupe) total += v.total_occurence;
     assert(total == 1);
 
     print_debug_state(h, "test_empty_stream_still_increments_eob");
@@ -153,7 +153,7 @@ void test_get_code_returns_259_for_invalid_length() {
 
     Huffman h;
     // No valid DEFLATE-style length table should cover a value this large.
-    u_int16_t code = h.get_code(100000);
+    u_int16_t code = h.get_len_code(100000);
     std::cout << "  get_code(100000) = " << code << std::endl;
     assert(code == 259);
 
@@ -175,7 +175,7 @@ void test_match_token_count_matches_get_code_output() {
     t.match.length = 3;     // set for completeness; NOT what count_occurrences actually reads
     std::vector<Token> buf = {t};
 
-    u_int16_t expected_code = h.get_code(t.literal);
+    u_int16_t expected_code = h.get_len_code(t.literal);
     std::cout << "  get_code(t.literal=" << t.literal << ") = " << expected_code << std::endl;
     print_token(t, 0);
 
@@ -185,11 +185,11 @@ void test_match_token_count_matches_get_code_output() {
         // get_code failed to resolve a bucket -> count_occurrences returns
         // early, before the EOB increment.
         int total = 0;
-        for (auto v : h.lit_len_counter) total += v.total_occurence;
+        for (auto v : h.lit_len_counter_dupe) total += v.total_occurence;
         assert(total == 0);
     } else {
-        assert(h.lit_len_counter[expected_code].total_occurence == 1);
-        assert(h.lit_len_counter[256].total_occurence == 1);
+        assert(h.lit_len_counter_dupe[expected_code].total_occurence == 1);
+        assert(h.lit_len_counter_dupe[256].total_occurence == 1);
     }
 
     print_debug_state(h, "test_match_token_count_matches_get_code_output");
@@ -231,11 +231,11 @@ void test_invalid_match_code_stops_processing_early() {
     print_debug_state(h, "test_invalid_match_code_stops_processing_early (after count_occurrences)");
 
     // Token processed before the error should be counted...
-    assert(h.lit_len_counter[0x41].total_occurence == 1);
+    assert(h.lit_len_counter_dupe[0x41].total_occurence == 1);
     // ...but the function returns immediately on error, so nothing after
     // it runs, and the trailing EOB increment (after the loop) never fires.
-    assert(h.lit_len_counter[0x42].total_occurence == 0);
-    assert(h.lit_len_counter[256].total_occurence == 0);
+    assert(h.lit_len_counter_dupe[0x42].total_occurence == 0);
+    assert(h.lit_len_counter_dupe[256].total_occurence == 0);
 
     std::cout << "[COMPLETE] test_invalid_match_code_stops_processing_early" << std::endl;
     std::cout << "---------------------------------------------------------------------" << std::endl;std::cout << "---------------------------------------------------------------------" << std::endl;
@@ -274,7 +274,7 @@ void test_debug_trace_mixed_stream() {
     // token hit the 259-error path, processing would have stopped early and
     // this still holds.
     int total_lit = 0;
-    for (size_t i = 0; i < h.lit_len_counter.size() - 1; ++i) total_lit += h.lit_len_counter[i].total_occurence;
+    for (size_t i = 0; i < h.lit_len_counter_dupe.size() - 1; ++i) total_lit += h.lit_len_counter_dupe[i].total_occurence;
     assert(total_lit <= static_cast<int>(buf.size()) + 1); // + 1 counts for the automatic incrementing EOB(256)
 
     std::cout << "[COMPLETE] test_debug_trace_mixed_stream" << std::endl;
@@ -298,15 +298,10 @@ void test_sort() {
     for (size_t i = 0; i < buf.size(); ++i) print_token(buf[i], i);
     h.count_occurrences(buf, static_cast<int>(buf.size()));
 
-    for (size_t i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
-        std::cout << i << "-" << i + 1 << " -> " << h.lit_len_counter[i].total_occurence << " >= " << h.lit_len_counter[i + 1].total_occurence << std::endl;
-    }
-
     std::cout << "Checking if object vector is sorted in ascending order...\n";
     h.sort();
-    for (size_t i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
-        std::cout << i << "-" << i + 1 << " -> " << h.lit_len_counter[i].total_occurence << " >= " << h.lit_len_counter[i + 1].total_occurence << std::endl;
-        assert(h.lit_len_counter[i].total_occurence >= h.lit_len_counter[i + 1].total_occurence);
+    for (size_t i = 0; i < int(h.lit_len_counter_dupe.size()) - 1; ++i) {
+        assert(h.lit_len_counter_dupe[i].total_occurence >= h.lit_len_counter_dupe[i + 1].total_occurence);
     }
     std::cout << "Object vector sort check SUCCESS\n";
 
@@ -319,13 +314,39 @@ void test_element_id_preservation() {
 
     std::cout << "[STARTING] test_element_id_preservation" << std::endl;
     
-    for (int i = 0; i < int(h.lit_len_counter.size()) - 1; ++i) {
-        std::cout << i << " : " << i + 1 << std::endl;
-       assert(h.lit_len_counter[i].element_id < h.lit_len_counter[i + 1].element_id);
+    for (int i = 0; i < int(h.lit_len_counter_dupe.size()) - 1; ++i) {
+       assert(h.lit_len_counter_dupe[i].element_id < h.lit_len_counter_dupe[i + 1].element_id);
     }
 
     std::cout << "[COMPLETE] test_element_id_preservation" << std::endl;
 }
+
+void test_distance_table() {
+    Huffman huff;
+
+    std::cout << "[STARTING] test_distance_table" << std::endl;
+
+    struct { u_int16_t distance; u_int16_t expected_code; } test_cases[10] = {
+        {1,     0},
+        {2,     1},
+        {4,     3},
+        {6,     4},
+        {8,     5},
+        {33,    10},
+        {128,   13},
+        {500,   17},
+        {1536,  20},
+        {32768, 29}
+    };
+
+    for (auto const& test : test_cases) {
+        u_int16_t const code = huff.get_dist_code(test.distance);
+        assert(code == test.expected_code);
+    }
+
+    std::cout << "[COMPLETE] test_distance_table" << std::endl;
+}
+
 
 int main() {
     test_single_literal_increments_counter();
@@ -339,5 +360,6 @@ int main() {
     test_debug_trace_mixed_stream();
     test_sort();
     test_element_id_preservation();
+    test_distance_table();
     return 0;
 }

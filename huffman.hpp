@@ -24,24 +24,6 @@ static constexpr CodeEntry length_table[29] = {
     {258,0}
 };
 
-// index with (symbol - 0), i.e. just the distance symbol directly
-static constexpr CodeEntry dist_table[30] = {
-    {1,0},{2,0},{3,0},{4,0},
-    {5,1},{7,1},
-    {9,2},{13,2},
-    {17,3},{25,3},
-    {33,4},{49,4},
-    {65,5},{97,5},
-    {129,6},{193,6},
-    {257,7},{385,7},
-    {513,8},{769,8},
-    {1025,9},{1537,9},
-    {2049,10},{3073,10},
-    {4097,11},{6145,11},
-    {8193,12},{12289,12},
-    {16385,13},{24577,13}
-};
-
 struct Code {
     u_int8_t  code_len;
     u_int16_t code;
@@ -54,6 +36,7 @@ typedef struct {
     u_int16_t max;
 } Length_To_Code;
 
+static constexpr u_int8_t LEN_TABLE_SIZE = 29;
 static constexpr Length_To_Code len_table[29] {
     {257,0,3,3},     {258,0,4,4},     {259,0,5,5},     {260,0,6,6},
     {261,0,7,7},     {262,0,8,8},     {263,0,9,9},     {264,0,10,10},
@@ -65,7 +48,17 @@ static constexpr Length_To_Code len_table[29] {
     {285,0,258,258}
 };
 
-static constexpr u_int8_t TABLE_SIZE = 29;
+static constexpr u_int8_t DIST_TABLE_SIZE = 30;
+static constexpr Length_To_Code dist_table[30] {
+    {0,  0, 1,     1},     {1,  0, 2,     2},     {2,  0, 3,     3},     {3,  0, 4,     4},
+    {4,  1, 5,     6},     {5,  1, 7,     8},     {6,  2, 9,     12},    {7,  2, 13,    16},
+    {8,  3, 17,    24},    {9,  3, 25,    32},    {10, 4, 33,    48},    {11, 4, 49,    64},
+    {12, 5, 65,    96},    {13, 5, 97,    128},   {14, 6, 129,   192},   {15, 6, 193,   256},
+    {16, 7, 257,   384},   {17, 7, 385,   512},   {18, 8, 513,   768},   {19, 8, 769,   1024},
+    {20, 9, 1025,  1536},  {21, 9, 1537,  2048},  {22, 10, 2049, 3072},  {23, 10, 3073, 4096},
+    {24, 11, 4097, 6144},  {25, 11, 6145, 8192},  {26, 12, 8193, 12288}, {27, 12, 12289,16384},
+    {28, 13, 16385,24576}, {29, 13, 24577,32768}
+};
 
 // token_hash.hpp
 //
@@ -121,7 +114,9 @@ class Huffman {
         // literal             = 0-255
         // end of block marker = 256
         // length              = 257-285
-        std::array<Tally, 286> lit_len_counter = {};
+        std::array<Tally, 286> lit_len_counter_actual = {};
+        std::array<Tally, 286> lit_len_counter_dupe = {};
+        std::vector<u_int16_t>     huffman_tree; // this is the huffman tree, might need to change ds later
         // counts the occurence of distance (pairs only)
         // NOTE: all ranges are inclusive
         // distance                         = 0-29
@@ -130,9 +125,11 @@ class Huffman {
 
         Huffman() {};
         u_int16_t count_occurrences(std::vector<Token>& buffer_stream, int const STREAM_SIZE);
-        u_int16_t get_code(u_int16_t const length);
-        void zero_all();
+        u_int16_t get_len_code(u_int16_t const length);
+        u_int16_t get_dist_code(u_int16_t const distance);
+        void reset_len_len_counter();
         void sort();
+        void generate_huffman_tree();
 };
 
 #endif
