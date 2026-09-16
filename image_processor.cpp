@@ -44,7 +44,9 @@ long Image::ppm_header_size(const std::filesystem::path& fileName) {
     return static_cast<long>(f.tellg());
 }
 
-Image::Image() {}
+Image::Image(std::string dir) {
+    this->source(dir);
+}
 
 void Image::source(std::string &dir) {
     _src = std::make_unique<std::fstream>(
@@ -75,7 +77,7 @@ void Image::clone() {
     _src->seekg(0, std::ios::end);
     std::streamsize srcSize = _src->tellg();
     _src->seekg(0, std::ios::beg);
-
+    
     // write from src -> dst
     std::vector<char> cloneBuffer(srcSize);
     _src->read(cloneBuffer.data(), srcSize);

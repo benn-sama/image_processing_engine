@@ -30,7 +30,10 @@ int Filter::subf(int const current_byte, int const go_back_n) {
 sub(x) = [curr_byte - bpp] mod 256
 bpp    = curr_byte then go back n (if x - 3 < 0, then it is 0)
 n      = (channel * bit_depth) / 8
+
+This needs [i], [i - 1]
 */
+// just needs one row
 int Filter::sub(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
     int sum = 0;
     int sub = 0;
@@ -52,7 +55,10 @@ int Filter::upf(int const current_byte, int const prior) {
 /*
 up() = raw(x) - prior(x)
 prior(x) = byte of previous line of index j, [i - 1][j]
+
+this needs [i][j], [i - 1][j]
 */
+// needs two rows
 int Filter::up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
     int sum = 0;
     int up  = 0;
@@ -78,6 +84,8 @@ int Filter::avgf(int const current_byte, int const prior, int const go_back_n) {
 }
 
 // this is identical to up's algorithm (prolly can do something about it)
+// this needs two rows
+// this needs [i][j], [i - 1][j]
 int Filter::avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
     int sum = 0;
     int avg = 0;
@@ -114,6 +122,8 @@ int Filter::paethf(int const up, int const left, int const top_left) {
     }
 }
 
+// this needs two rows
+// this needs [i], [i][j - 1], [i - 1][j - 1]
 int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
     int sum   = 0;
     int paeth = 0;
@@ -131,7 +141,7 @@ int Filter::paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>
     return sum / ARR_SIZE;
 }
 
-
+// needs one row
 int Filter::none(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
     int sum = 0;
 

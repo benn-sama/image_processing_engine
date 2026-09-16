@@ -33,10 +33,15 @@ class Image {
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
     public:
-        Image();
+        Image(std::string dir);
         void source(std::string &dir); // declare src directory
         void dest(std::string &dir);   // declare dest directory
         void clone();
+        /*
+        l = luminosity
+        a = avg
+        t = lightness
+        */
         void greyscale(char &fmethod);
         std::fstream* get_ptr() { return _src.get(); };
         int get_width()   { return _width;  }

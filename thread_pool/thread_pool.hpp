@@ -16,7 +16,8 @@ class ThreadPool{
         std::condition_variable cv;                // for signaling
         int                     ready = 0;         // prevent spurious wakeups
 
-        std::vector <int>       queue;             // task queue
+        // this will definitely be the shared resource
+        std::vector <int>       queue;             // task queue - this will hold the index of which rows need to be done
         void                    startThreads();    // starts the threads
     public:
         ThreadPool(short threadCount);             // constructor that initializes the number of threads

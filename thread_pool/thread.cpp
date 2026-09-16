@@ -33,20 +33,21 @@ void Thread::doWork(std::mutex& mutex, std::condition_variable& cv, int& ready) 
     using namespace std::literals::chrono_literals;
     RandomNum random;
 
-    while (true) {
+    while (true) { // this needs to end when all tasks are done
       {
-      std::unique_lock<std::mutex> lk(mutex);
-      std::cout << id << ": Hello!" << std::endl;
-      // -- THREAD WAITS HERE
-      cv.wait(lk, [&ready] { return ready > 0; });
+        std::unique_lock<std::mutex> lk(mutex);
+        std::cout << id << ": Hello!" << std::endl;
+        // -- THREAD WAITS HERE
+        cv.wait(lk, [&ready] { return ready > 0; });
 
-      std::cout << id << ": wokeup\n";
-      std::cout << id << ": working...\n";
-      
-      // reset ready
-      ready = 0;
+        std::cout << id << ": wokeup\n";
+        std::cout << id << ": working...\n";
+        
+        // reset ready
+        ready = 0;
       }
       
+      // this here is the actual work for the thread
       std::this_thread::sleep_for(std::chrono::milliseconds(random.getRandomNum(1000, 10000)));
       std::cout << id << ": done!\n";
       std::cout << id << ": going back to sleep.\n";
