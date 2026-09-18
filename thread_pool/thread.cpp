@@ -61,7 +61,7 @@ void Thread::doWork(std::mutex& mutex, std::condition_variable& cv, int& ready) 
 }
 
 void Thread::greyscale(std::mutex& mutex, std::condition_variable& cv, int& ready, std::vector<std::vector<unsigned char>>& photo, std::stack<int>& work_queue, bool is_work_available) {
-    while (is_work_available) { // this needs to end when all tasks are done
+    if (is_work_available) { // this needs to end when all tasks are done
       {
         std::unique_lock<std::mutex> lk(mutex);
         // -- THREAD WAITS HERE
