@@ -47,3 +47,30 @@ void ThreadPool::run() {
         }
     }
 }
+
+/*
+What this does:
+  - Fills the work_queue with jobs
+
+What are the jobs?
+  These jobs are ints that represent each row up to the row_size of the photo
+*/
+void ThreadPool::instantiate_work_queue(int const row_size) {
+    for (int i = 0; i < row_size; ++i) {
+        work_queue.push(i);
+    }
+}
+
+/*
+What this does:
+  - Completely clear the work_queue
+*/
+int ThreadPool::clear_work_queue() {
+    if (int size = (int)work_queue.size() > 0) {
+        for (int i = 0; i < size; ++i) {
+            work_queue.pop();
+        }
+    }
+
+    return work_queue.size() > 0 ? 0 : 1;
+}

@@ -2,6 +2,7 @@
 #define IMAGE_PROCESSOR_HPP
 
 #include "greyscale.hpp"
+#include "/thread_pool/thread_pool.hpp"
 
 #include <fstream>
 #include <memory>
@@ -32,6 +33,9 @@ class Image {
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
+
+        // thread pool for work
+        ThreadPool thread_pool;
     public:
         Image(std::string dir);
         void source(std::string &dir); // declare src directory

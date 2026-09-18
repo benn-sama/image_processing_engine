@@ -7,6 +7,8 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <vector>
+#include <stack>
 
 #include "../random_num_gen.cpp"
 
@@ -26,6 +28,7 @@ class Thread {
         uint16_t getID();                                                             // returns id
         void     run(std::mutex& mutex, std::condition_variable& cv, int& ready);     // creates the thread
         void     wait();
+        void     greyscale(std::mutex& mutex, std::condition_variable& cv, int& ready, std::vector<std::vector<unsigned char>>& photo, std::stack<int>& work_queue, bool is_work_available);  // simulates thread working
 };
 
 #endif

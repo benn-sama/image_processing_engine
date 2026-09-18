@@ -17,11 +17,13 @@ class ThreadPool{
         int                     ready = 0;         // prevent spurious wakeups
 
         // this will definitely be the shared resource
-        std::vector <int>       queue;             // task queue - this will hold the index of which rows need to be done
-        void                    startThreads();    // starts the threads
+        std::stack<int>       work_queue;             // task queue - this will hold the index of which rows need to be done
+        void                  startThreads();    // starts the threads
     public:
         ThreadPool(short threadCount);             // constructor that initializes the number of threads
+        void instantiate_work_queue(int const row_size);
         void run();                                // threads start running here
+        int clear_work_queue();
 };
 
 #endif

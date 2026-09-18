@@ -77,7 +77,7 @@ void Image::clone() {
     _src->seekg(0, std::ios::end);
     std::streamsize srcSize = _src->tellg();
     _src->seekg(0, std::ios::beg);
-    
+
     // write from src -> dst
     std::vector<char> cloneBuffer(srcSize);
     _src->read(cloneBuffer.data(), srcSize);

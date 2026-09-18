@@ -60,6 +60,27 @@ void Thread::doWork(std::mutex& mutex, std::condition_variable& cv, int& ready) 
     }
 }
 
+void Thread::greyscale(std::mutex& mutex, std::condition_variable& cv, int& ready, std::vector<std::vector<unsigned char>>& photo, std::stack<int>& work_queue, bool is_work_available) {
+    while (is_work_available) { // this needs to end when all tasks are done
+      {
+        std::unique_lock<std::mutex> lk(mutex);
+        // -- THREAD WAITS HERE
+        cv.wait(lk, [&ready] { return ready > 0; });
+        work_queue.pop();
+        // reset ready
+        ready = 0;
+      }
+      
+      // this here is the actual work for the thread
+    
+      {
+        std::unique_lock<std::mutex> lk(mutex);
+        --total_working;
+      }
+
+    }
+}
+
 /*
  Method: 
    getID()

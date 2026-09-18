@@ -39,10 +39,10 @@ int Filter::sub(std::vector<unsigned char>& bottom, std::vector<std::vector<unsi
     int sub = 0;
     
     for (size_t i = 1; i < ARR_SIZE; ++i) {
-        int prev = (i < _bpp) ? 0 : bottom[i - _bpp];
-        sub      = subf((int)bottom[i], prev);
+        int prev        = (i < _bpp) ? 0 : bottom[i - _bpp];
+        sub             = subf((int)bottom[i], prev);
         filtersv[1][i]  = sub;
-        sum     += sub;
+        sum            += sub;
     }
 
     return sum / ARR_SIZE;

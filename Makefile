@@ -46,6 +46,7 @@ clean:
 	rm -f ./thread_pool/*.o & \
 	rm -f ./tests/test ./tests/test_scanline  ./tests/test_huffman \
 	rm -f ./tests/*.o \
-	rm -f ./tests/performance_test
+	rm -f ./tests/performance_test \
+	rm -f -- photos/*copy*
 
 .PHONY: run-main all tests run-perf-test
