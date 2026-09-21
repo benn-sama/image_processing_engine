@@ -42,7 +42,7 @@ class Filter {
         int paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE);
         int none(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE);
         
-        void filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE);
+        int filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, const int ARR_SIZE);
 };
 
 #endif

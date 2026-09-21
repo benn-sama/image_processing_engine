@@ -3,6 +3,7 @@
 
 #include "greyscale.hpp"
 #include "/thread_pool/thread_pool.hpp"
+#include "filter.hpp"
 
 #include <fstream>
 #include <memory>
@@ -24,6 +25,7 @@ class Image {
         
         // greyscale related
         Greyscale greyf;
+        Filter    gray_filter; //
 
         // anything image header related
         long                          _offset  = 0;  // size of the src header

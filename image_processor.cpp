@@ -200,7 +200,7 @@ void Image::greyscale_adaptive() {
                 break;
             case ('a'):
                 grey = greyf.avgMethodf(red, green, blue);
-                break;
+                break
             case ('t'):
                 grey = greyf.lightnessf(red, green, blue);
                 break;

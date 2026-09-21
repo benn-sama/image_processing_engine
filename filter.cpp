@@ -157,10 +157,12 @@ What it does:
  This is an adaptive filtering method, this chooses the filter with the least sum.
  This attempts to maximize compression by choosing the least sum.
 
+What it returns:
+ This returns an INT of the least sum average of all 5 grayscale function.
  NOTE:
     - ASSUME scanline is CURR_ARRAY_SIZE + 1. First byte notes which filter is being chosen for that scanline
 */
-void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, std::vector<unsigned char>& alter, int const ARR_SIZE) {
+int Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, const int ARR_SIZE) {
     // preallocate 
     int VEC_SIZE = ARR_SIZE + 1;
     std::array<int, 5>         dumb_arr;
@@ -201,8 +203,5 @@ void Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsign
         }
     }
 
-    // overwrites alter with the choses scanline
-    for (int i = 0; i < VEC_SIZE; ++i) {
-        alter[i] = filtersv[pos][i];
-    }
+    return least;
 }
