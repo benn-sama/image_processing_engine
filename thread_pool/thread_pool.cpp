@@ -59,6 +59,9 @@ void ThreadPool::instantiate_work_queue(int const row_size) {
     for (int i = 0; i < row_size; ++i) {
         work_queue.push(i);
     }
+
+    // a flag to show that work is available
+    is_work_available = true;
 }
 
 /*

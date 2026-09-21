@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <vector>
+#include <atomic>
 
 class ThreadPool{
     private:
@@ -17,8 +18,10 @@ class ThreadPool{
         int                     ready = 0;         // prevent spurious wakeups
 
         // this will definitely be the shared resource
-        std::stack<int>       work_queue;             // task queue - this will hold the index of which rows need to be done
-        void                  startThreads();    // starts the threads
+        std::stack<unsigned int> work_queue;             // task queue - this will hold the index of which rows need to be done
+        std::stack<unsigned int> remaining_work_queue; // tasks should go here single line read is optimal,
+        void                     startThreads();    // starts the threads
+        std::atomic<bool>        is_work_available = false;
     public:
         ThreadPool(short threadCount);             // constructor that initializes the number of threads
         void instantiate_work_queue(int const row_size);

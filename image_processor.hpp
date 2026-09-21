@@ -47,6 +47,7 @@ class Image {
         t = lightness
         */
         void greyscale(char &fmethod);
+        void greyscale_adaptive();
         std::fstream* get_ptr() { return _src.get(); };
         int get_width()   { return _width;  }
         int get_height()  { return _height; }
