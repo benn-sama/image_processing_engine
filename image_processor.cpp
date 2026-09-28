@@ -1,7 +1,5 @@
 #include "image_processor.hpp"
-#include <filesystem>
-#include <memory>
-#include <ratio>
+
 /*
  * Returns the location of the ptr where header_size + 1
  */
@@ -151,70 +149,117 @@ void Image::greyscale(char &fmethod) {
     }
 }
 
-void Image::greyscale_adaptive() {
-    // first checks if source exists
-    if (_src == nullptr) {
-        std::cout << "No src found\n";
-        return;
-    }
+void Image::get_chunk() {
+    std::vector<std::vector<unsigned char>> current_chunk; // puts this bad boy into ram *gulp*
 
-    // then checks if desired dest dir exists, if not assign a default dest
-    if (_dst == nullptr) {
-        std::cout << "No dst found\n";
+    // w x h = 3840 x 2460
+    int gcd = std::gcd(_width, _height);
+    int chunk_width  = _width / gcd;
+    int chunk_height = _height / gcd;
 
-        std::string tempDir     = _srcName;
-        int         dotppmIndex = tempDir.find(".ppm"); 
-        std::string newDir      = tempDir.insert(dotppmIndex, " copy");
-        int         appendIndex = 0;
+    /*
+    gets the first row of chunks
+    for ex.
+    -----------------
+    | a | b | c | d |
+    | e | f | g | h |
+    ... continue until a x a ...
 
-        namespace fs = std::filesystem;
-
-        // this keeps appending infinitely until finds one that isn't taken
-        while (fs::exists(newDir)) {
-            appendIndex = appendIndex + 5;
-            newDir = tempDir.insert(dotppmIndex + appendIndex, " copy");
+    gets a, b, c, d
+    */
+    for (; _y < chunk_height; ++_y) {
+        _dst->read(reinterpret_cast<char*>(current_chunk[_y].data()), _width);
+        for (int i = 0; i < _y; ++i) {
+            for (int j = 0; i < _width; ++j) {
+                std::cout << "[" << i << "]" << "[" << j << "]" << (int)current_chunk[i][j] << std::endl;
+            }
         }
-
-        _dst = std::make_unique<std::fstream>(
-            newDir,
-            std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc
-        );
-    }
-
-    // clones file so we don't mess with the original
-    std::cout << "cloning file.\n";
-    this->clone();
-    std::cout << "cloned file.\n";
-
-    std::unique_ptr buffer = std::make_unique<char[]>(3);
-    while (_dst->read(buffer.get(), 3)) {
-        int red   = (unsigned char)buffer[0];
-        int green = (unsigned char)buffer[1];
-        int blue  = (unsigned char)buffer[2];
-
-        int grey = 0;
-
-        switch (fmethod) {
-            case ('l'):
-                grey = greyf.luminosityf(red, green, blue);
-                break;
-            case ('a'):
-                grey = greyf.avgMethodf(red, green, blue);
-                break
-            case ('t'):
-                grey = greyf.lightnessf(red, green, blue);
-                break;
-            default:
-                grey = greyf.avgMethodf(red, green, blue);
-                break;
-        }
-
-        _dst->seekp(-3, std::ios::cur); // goes back 3 bytes
-        for (int i = 0; i < 3; ++i) {
-            _dst->put(grey);
-        }
-
-        // ++count;
-        // std::cout << "count: " << count << std::endl;
     }
 }
+
+void Image::extract_finished_chunk() {
+
+}
+
+/*
+Strat A for multi-threading:
+
+- Put a x gcd(a, b) into ram
+- Loop over [gcd][gcd]
+- Multiple threads work under one chunk
+- When finished, calls a thread to extract the chunk into disc
+- Then, goes the next chunk
+
+*/
+void Image::strat_A() {
+
+}
+
+
+// void Image::greyscale_adaptive() {
+//     // first checks if source exists
+//     if (_src == nullptr) {
+//         std::cout << "No src found\n";
+//         return;
+//     }
+
+//     // then checks if desired dest dir exists, if not assign a default dest
+//     if (_dst == nullptr) {
+//         std::cout << "No dst found\n";
+
+//         std::string tempDir     = _srcName;
+//         int         dotppmIndex = tempDir.find(".ppm"); 
+//         std::string newDir      = tempDir.insert(dotppmIndex, " copy");
+//         int         appendIndex = 0;
+
+//         namespace fs = std::filesystem;
+
+//         // this keeps appending infinitely until finds one that isn't taken
+//         while (fs::exists(newDir)) {
+//             appendIndex = appendIndex + 5;
+//             newDir = tempDir.insert(dotppmIndex + appendIndex, " copy");
+//         }
+
+//         _dst = std::make_unique<std::fstream>(
+//             newDir,
+//             std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc
+//         );
+//     }
+
+//     // clones file so we don't mess with the original
+//     std::cout << "cloning file.\n";
+//     this->clone();
+//     std::cout << "cloned file.\n";
+
+//     std::unique_ptr buffer = std::make_unique<char[]>(3);
+//     while (_dst->read(buffer.get(), 3)) {
+//         int red   = (unsigned char)buffer[0];
+//         int green = (unsigned char)buffer[1];
+//         int blue  = (unsigned char)buffer[2];
+
+//         int grey = 0;
+
+//         switch (gray_filter.filter_scanline(std::vector<unsigned char> &top, std::vector<unsigned char> &bottom, const int ARR_SIZE)) {
+//             case ('l'):
+//                 grey = greyf.luminosityf(red, green, blue);
+//                 break;
+//             case ('a'):
+//                 grey = greyf.avgMethodf(red, green, blue);
+//                 break
+//             case ('t'):
+//                 grey = greyf.lightnessf(red, green, blue);
+//                 break;
+//             default:
+//                 grey = greyf.avgMethodf(red, green, blue);
+//                 break;
+//         }
+
+//         _dst->seekp(-3, std::ios::cur); // goes back 3 bytes
+//         for (int i = 0; i < 3; ++i) {
+//             _dst->put(grey);
+//         }
+
+//         // ++count;
+//         // std::cout << "count: " << count << std::endl;
+//     }
+// }

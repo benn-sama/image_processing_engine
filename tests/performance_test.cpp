@@ -17,7 +17,7 @@ auto elapsed_time(steady_clock::time_point start, steady_clock::time_point end) 
     return duration_cast<milliseconds>(end - start);
 }
 
-int main() {
+void performance_test() {
     char lumin = 'l';
     char avg = 'a';
     char lightness = 't';

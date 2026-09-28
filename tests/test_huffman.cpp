@@ -347,8 +347,7 @@ void test_distance_table() {
     std::cout << "[COMPLETE] test_distance_table" << std::endl;
 }
 
-
-int main() {
+void test_huffman() {
     test_single_literal_increments_counter();
     test_multiple_occurrences_of_same_literal();
     test_distinct_literals_counted_separately();
@@ -361,5 +360,4 @@ int main() {
     test_sort();
     test_element_id_preservation();
     test_distance_table();
-    return 0;
 }

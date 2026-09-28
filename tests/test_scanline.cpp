@@ -10,7 +10,7 @@
 // MODFIED BY MYSELF
 
 
-int main() {
+void test_sacnline() {
     int pass_count = 0;
     int fail_count = 0;
 
@@ -222,11 +222,9 @@ int main() {
         std::cout << "╔════════════════════════════════════════════════╗\n";
         std::cout << "║          ✓ ALL TESTS PASSED!                   ║\n";
         std::cout << "╚════════════════════════════════════════════════╝\n\n";
-        return 0;
     } else {
         std::cout << "╔════════════════════════════════════════════════╗\n";
         std::cout << "║          ✗ SOME TESTS FAILED                   ║\n";
         std::cout << "╚════════════════════════════════════════════════╝\n\n";
-        return 1;
     }
 }

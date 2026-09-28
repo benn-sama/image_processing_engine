@@ -2,17 +2,21 @@
 #define IMAGE_PROCESSOR_HPP
 
 #include "greyscale.hpp"
-#include "/thread_pool/thread_pool.hpp"
+#include "thread_pool/thread.hpp"
+#include "thread_pool/thread_pool.hpp"
 #include "filter.hpp"
 
+#include <cstdint>
 #include <fstream>
 #include <memory>
 #include <fstream>
 #include <memory>
 #include <cstdio>
 #include <filesystem>
-#include <ios>
 #include <iostream>
+#include <filesystem>
+#include <memory>
+
 
 class Image {
     private:
@@ -22,6 +26,7 @@ class Image {
         std::string                   _dstName   = "";       // dir of dest
         bool                          _modifystr = false;
         bool                          _isValid   = true;
+        std::vector<unsigned char>    _currentChunk;
         
         // greyscale related
         Greyscale greyf;
@@ -32,12 +37,14 @@ class Image {
         int                           _width   = 0;  // width of the image
         int                           _height  = 0;  // width of the image
         int                           _maxval  = 0;  // maxval of the image size of bits in one channel
+        
+        intmax_t                     _y = 0;
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
 
         // thread pool for work
-        ThreadPool thread_pool;
+        ThreadPool thread_pool = ThreadPool(5);
     public:
         Image(std::string dir);
         void source(std::string &dir); // declare src directory
@@ -54,6 +61,12 @@ class Image {
         int get_width()   { return _width;  }
         int get_height()  { return _height; }
         long get_offset() { return _offset; };
+
+        void get_chunk();
+        void extract_finished_chunk();
+
+        // strats
+        void strat_A();
 
         // testing
         void print() {

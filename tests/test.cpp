@@ -272,7 +272,7 @@ uint32_t to_decimal(std::array<unsigned char, 4> IDATLengthHex) {
         return length;
 }
 
-int main() {
+void test() {
     std::fstream* f = new std::fstream("photos/car-p.png", std::ios::in | std::ios::binary);
 
     f->seekg(8, std::ios::end);
@@ -342,7 +342,6 @@ int main() {
     chunks[int(chunks.size())].print();
 
     std::cout << "Found IEND @: " << std::dec << currIndex << std::endl;
-
 
 }
     

@@ -208,7 +208,7 @@ void test_match_length_does_not_exceed_uint16_max() {
     std::cout << "[COMPLETE] test_match_length_does_not_exceed_uint16_max" << std::endl;
 }
 
-int main() {
+void lz77() {
     // LZ77 lz77;
     test_basic_four_bytes();
     test_all_zeros();
