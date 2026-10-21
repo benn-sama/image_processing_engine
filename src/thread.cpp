@@ -1,4 +1,4 @@
-#include "thread.hpp"
+#include "../include/thread.hpp"
 #include <chrono>
 #include <condition_variable>
 #include <functional>

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/clang++
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/home/bgreen/image_processing_engine/include
 
-CXX_FLAGS = -g
+CXX_FLAGS = -g -std=gnu++20
 

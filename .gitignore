@@ -1,1 +1,5 @@
 /.vscode
+
+build/_deps
+
+.cache

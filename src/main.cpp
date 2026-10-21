@@ -26,7 +26,7 @@ int main(int argc, char*argv[]) {
     // ThreadPool pool(threadCount);
     // pool.run();
     
-    Image img;
+    Image img(dir);
     img.source(dir);
     img.greyscale(*choice);
 }

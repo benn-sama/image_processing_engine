@@ -69,31 +69,175 @@ include CMakeFiles/main.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/main.dir/flags.make
 
-CMakeFiles/main.dir/main.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/main.cpp.o: /home/bgreen/image_processing_engine/main.cpp
-CMakeFiles/main.dir/main.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/main.cpp.o"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/main.cpp.o -MF CMakeFiles/main.dir/main.cpp.o.d -o CMakeFiles/main.dir/main.cpp.o -c /home/bgreen/image_processing_engine/main.cpp
+CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/main.cpp.o: /home/bgreen/image_processing_engine/src/main.cpp
+CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/main.cpp.o -MF CMakeFiles/main.dir/src/main.cpp.o.d -o CMakeFiles/main.dir/src/main.cpp.o -c /home/bgreen/image_processing_engine/src/main.cpp
 
-CMakeFiles/main.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/main.cpp.i"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/main.cpp > CMakeFiles/main.dir/main.cpp.i
+CMakeFiles/main.dir/src/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/main.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/main.cpp > CMakeFiles/main.dir/src/main.cpp.i
 
-CMakeFiles/main.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/main.cpp.s"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/main.cpp -o CMakeFiles/main.dir/main.cpp.s
+CMakeFiles/main.dir/src/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/main.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/main.cpp -o CMakeFiles/main.dir/src/main.cpp.s
+
+CMakeFiles/main.dir/src/filter.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/filter.cpp.o: /home/bgreen/image_processing_engine/src/filter.cpp
+CMakeFiles/main.dir/src/filter.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/filter.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/filter.cpp.o -MF CMakeFiles/main.dir/src/filter.cpp.o.d -o CMakeFiles/main.dir/src/filter.cpp.o -c /home/bgreen/image_processing_engine/src/filter.cpp
+
+CMakeFiles/main.dir/src/filter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/filter.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/filter.cpp > CMakeFiles/main.dir/src/filter.cpp.i
+
+CMakeFiles/main.dir/src/filter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/filter.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/filter.cpp -o CMakeFiles/main.dir/src/filter.cpp.s
+
+CMakeFiles/main.dir/src/greyscale.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/greyscale.cpp.o: /home/bgreen/image_processing_engine/src/greyscale.cpp
+CMakeFiles/main.dir/src/greyscale.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/greyscale.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/greyscale.cpp.o -MF CMakeFiles/main.dir/src/greyscale.cpp.o.d -o CMakeFiles/main.dir/src/greyscale.cpp.o -c /home/bgreen/image_processing_engine/src/greyscale.cpp
+
+CMakeFiles/main.dir/src/greyscale.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/greyscale.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/greyscale.cpp > CMakeFiles/main.dir/src/greyscale.cpp.i
+
+CMakeFiles/main.dir/src/greyscale.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/greyscale.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/greyscale.cpp -o CMakeFiles/main.dir/src/greyscale.cpp.s
+
+CMakeFiles/main.dir/src/huffman.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/huffman.cpp.o: /home/bgreen/image_processing_engine/src/huffman.cpp
+CMakeFiles/main.dir/src/huffman.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/huffman.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/huffman.cpp.o -MF CMakeFiles/main.dir/src/huffman.cpp.o.d -o CMakeFiles/main.dir/src/huffman.cpp.o -c /home/bgreen/image_processing_engine/src/huffman.cpp
+
+CMakeFiles/main.dir/src/huffman.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/huffman.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/huffman.cpp > CMakeFiles/main.dir/src/huffman.cpp.i
+
+CMakeFiles/main.dir/src/huffman.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/huffman.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/huffman.cpp -o CMakeFiles/main.dir/src/huffman.cpp.s
+
+CMakeFiles/main.dir/src/image_processor.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/image_processor.cpp.o: /home/bgreen/image_processing_engine/src/image_processor.cpp
+CMakeFiles/main.dir/src/image_processor.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/image_processor.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/image_processor.cpp.o -MF CMakeFiles/main.dir/src/image_processor.cpp.o.d -o CMakeFiles/main.dir/src/image_processor.cpp.o -c /home/bgreen/image_processing_engine/src/image_processor.cpp
+
+CMakeFiles/main.dir/src/image_processor.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/image_processor.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/image_processor.cpp > CMakeFiles/main.dir/src/image_processor.cpp.i
+
+CMakeFiles/main.dir/src/image_processor.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/image_processor.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/image_processor.cpp -o CMakeFiles/main.dir/src/image_processor.cpp.s
+
+CMakeFiles/main.dir/src/lz77.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/lz77.cpp.o: /home/bgreen/image_processing_engine/src/lz77.cpp
+CMakeFiles/main.dir/src/lz77.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/main.dir/src/lz77.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/lz77.cpp.o -MF CMakeFiles/main.dir/src/lz77.cpp.o.d -o CMakeFiles/main.dir/src/lz77.cpp.o -c /home/bgreen/image_processing_engine/src/lz77.cpp
+
+CMakeFiles/main.dir/src/lz77.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/lz77.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/lz77.cpp > CMakeFiles/main.dir/src/lz77.cpp.i
+
+CMakeFiles/main.dir/src/lz77.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/lz77.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/lz77.cpp -o CMakeFiles/main.dir/src/lz77.cpp.s
+
+CMakeFiles/main.dir/src/pngt.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/pngt.cpp.o: /home/bgreen/image_processing_engine/src/pngt.cpp
+CMakeFiles/main.dir/src/pngt.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/main.dir/src/pngt.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/pngt.cpp.o -MF CMakeFiles/main.dir/src/pngt.cpp.o.d -o CMakeFiles/main.dir/src/pngt.cpp.o -c /home/bgreen/image_processing_engine/src/pngt.cpp
+
+CMakeFiles/main.dir/src/pngt.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/pngt.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/pngt.cpp > CMakeFiles/main.dir/src/pngt.cpp.i
+
+CMakeFiles/main.dir/src/pngt.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/pngt.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/pngt.cpp -o CMakeFiles/main.dir/src/pngt.cpp.s
+
+CMakeFiles/main.dir/src/random_num_gen.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/random_num_gen.cpp.o: /home/bgreen/image_processing_engine/src/random_num_gen.cpp
+CMakeFiles/main.dir/src/random_num_gen.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/main.dir/src/random_num_gen.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/random_num_gen.cpp.o -MF CMakeFiles/main.dir/src/random_num_gen.cpp.o.d -o CMakeFiles/main.dir/src/random_num_gen.cpp.o -c /home/bgreen/image_processing_engine/src/random_num_gen.cpp
+
+CMakeFiles/main.dir/src/random_num_gen.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/random_num_gen.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/random_num_gen.cpp > CMakeFiles/main.dir/src/random_num_gen.cpp.i
+
+CMakeFiles/main.dir/src/random_num_gen.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/random_num_gen.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/random_num_gen.cpp -o CMakeFiles/main.dir/src/random_num_gen.cpp.s
+
+CMakeFiles/main.dir/src/thread_pool.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/thread_pool.cpp.o: /home/bgreen/image_processing_engine/src/thread_pool.cpp
+CMakeFiles/main.dir/src/thread_pool.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/main.dir/src/thread_pool.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/thread_pool.cpp.o -MF CMakeFiles/main.dir/src/thread_pool.cpp.o.d -o CMakeFiles/main.dir/src/thread_pool.cpp.o -c /home/bgreen/image_processing_engine/src/thread_pool.cpp
+
+CMakeFiles/main.dir/src/thread_pool.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/thread_pool.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/thread_pool.cpp > CMakeFiles/main.dir/src/thread_pool.cpp.i
+
+CMakeFiles/main.dir/src/thread_pool.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/thread_pool.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/thread_pool.cpp -o CMakeFiles/main.dir/src/thread_pool.cpp.s
+
+CMakeFiles/main.dir/src/thread.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/thread.cpp.o: /home/bgreen/image_processing_engine/src/thread.cpp
+CMakeFiles/main.dir/src/thread.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/main.dir/src/thread.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/thread.cpp.o -MF CMakeFiles/main.dir/src/thread.cpp.o.d -o CMakeFiles/main.dir/src/thread.cpp.o -c /home/bgreen/image_processing_engine/src/thread.cpp
+
+CMakeFiles/main.dir/src/thread.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/main.dir/src/thread.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bgreen/image_processing_engine/src/thread.cpp > CMakeFiles/main.dir/src/thread.cpp.i
+
+CMakeFiles/main.dir/src/thread.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/thread.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bgreen/image_processing_engine/src/thread.cpp -o CMakeFiles/main.dir/src/thread.cpp.s
 
 # Object files for target main
 main_OBJECTS = \
-"CMakeFiles/main.dir/main.cpp.o"
+"CMakeFiles/main.dir/src/main.cpp.o" \
+"CMakeFiles/main.dir/src/filter.cpp.o" \
+"CMakeFiles/main.dir/src/greyscale.cpp.o" \
+"CMakeFiles/main.dir/src/huffman.cpp.o" \
+"CMakeFiles/main.dir/src/image_processor.cpp.o" \
+"CMakeFiles/main.dir/src/lz77.cpp.o" \
+"CMakeFiles/main.dir/src/pngt.cpp.o" \
+"CMakeFiles/main.dir/src/random_num_gen.cpp.o" \
+"CMakeFiles/main.dir/src/thread_pool.cpp.o" \
+"CMakeFiles/main.dir/src/thread.cpp.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
-main: CMakeFiles/main.dir/main.cpp.o
+main: CMakeFiles/main.dir/src/main.cpp.o
+main: CMakeFiles/main.dir/src/filter.cpp.o
+main: CMakeFiles/main.dir/src/greyscale.cpp.o
+main: CMakeFiles/main.dir/src/huffman.cpp.o
+main: CMakeFiles/main.dir/src/image_processor.cpp.o
+main: CMakeFiles/main.dir/src/lz77.cpp.o
+main: CMakeFiles/main.dir/src/pngt.cpp.o
+main: CMakeFiles/main.dir/src/random_num_gen.cpp.o
+main: CMakeFiles/main.dir/src/thread_pool.cpp.o
+main: CMakeFiles/main.dir/src/thread.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/bgreen/image_processing_engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
