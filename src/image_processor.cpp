@@ -1,4 +1,4 @@
-#include "image_processor.hpp"
+#include "../include/image_processor.hpp"
 
 /*
  * Returns the location of the ptr where header_size + 1

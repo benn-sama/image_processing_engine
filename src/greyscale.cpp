@@ -1,4 +1,4 @@
-#include "greyscale.hpp"
+#include "../include/greyscale.hpp"
 
 /*
  * Returns the luminosity function for greyscaling Greyscales

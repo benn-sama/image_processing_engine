@@ -1,5 +1,5 @@
-#include "./thread_pool/thread_pool.hpp"
-#include "image_processor.hpp"
+#include "../include/thread_pool.hpp"
+#include "../include/image_processor.hpp"
 
 int main(int argc, char*argv[]) {
     int threadCount = 5;

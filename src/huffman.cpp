@@ -1,5 +1,5 @@
-#include "huffman.hpp"
-#include "lz77.hpp"
+#include "../include/huffman.hpp"
+#include "../include/lz77.hpp"
 #include <functional>
 #include <sys/types.h>
 

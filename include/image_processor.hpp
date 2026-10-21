@@ -2,8 +2,8 @@
 #define IMAGE_PROCESSOR_HPP
 
 #include "greyscale.hpp"
-#include "thread_pool/thread.hpp"
-#include "thread_pool/thread_pool.hpp"
+#include "thread.hpp"
+#include "thread_pool.hpp"
 #include "filter.hpp"
 
 #include <cstdint>

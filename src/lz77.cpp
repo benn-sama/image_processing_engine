@@ -1,4 +1,4 @@
-#include "lz77.hpp"
+#include "../include/lz77.hpp"
 #include <cstddef>
 #include <cstdio>
 #include <cstring>

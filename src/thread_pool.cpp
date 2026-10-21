@@ -1,5 +1,5 @@
-#include "thread_pool.hpp"
-#include "thread.hpp"
+#include "../include/thread_pool.hpp"
+#include "../include/thread.hpp"
 
 int total_working = 0;
 
