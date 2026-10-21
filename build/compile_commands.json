@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/bgreen/image_processing_engine/build",
+  "command": "/usr/bin/clang++   -g -o CMakeFiles/main.dir/main.cpp.o -c /home/bgreen/image_processing_engine/main.cpp",
+  "file": "/home/bgreen/image_processing_engine/main.cpp",
+  "output": "CMakeFiles/main.dir/main.cpp.o"
+}
+]

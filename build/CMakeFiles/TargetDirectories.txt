@@ -1,0 +1,3 @@
+/home/bgreen/image_processing_engine/build/CMakeFiles/main.dir
+/home/bgreen/image_processing_engine/build/CMakeFiles/edit_cache.dir
+/home/bgreen/image_processing_engine/build/CMakeFiles/rebuild_cache.dir
