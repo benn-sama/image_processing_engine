@@ -33,12 +33,16 @@ class Image {
         Filter    gray_filter; //
 
         // anything image header related
-        long                          _offset  = 0;  // size of the src header
-        int                           _width   = 0;  // width of the image
-        int                           _height  = 0;  // width of the image
-        int                           _maxval  = 0;  // maxval of the image size of bits in one channel
-        
-        intmax_t                     _y = 0;
+        long  _offset  = 0;  // size of the src header
+        int   _width   = 0;  // width of the image
+        int   _height  = 0;  // width of the image
+        int   _maxval  = 0;  // maxval of the image size of bits in one channel
+       
+        // these variables keep track of the chunks
+        intmax_t _curr_chunk_height = 0; // this tracks which row of chunk it's currently in. SHOULD NEVER GO ABOVE _height
+        int      _gcd             = 0;
+        int      _chunk_width     = 0;
+        int      _chunk_height    = 0;
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
@@ -62,7 +66,7 @@ class Image {
         int get_height()  { return _height; }
         long get_offset() { return _offset; };
 
-        void get_chunk();
+        std::vector<std::vector<unsigned char>> get_chunk();
         void extract_finished_chunk();
 
         // strats

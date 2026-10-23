@@ -1,4 +1,4 @@
-#include "../image_processor.hpp"
+#include "../include/image_processor.hpp"
 
 void test_get_chunk() {
     Image img("photos/1080_1.ppm");
@@ -12,4 +12,8 @@ void test_get_chunk() {
 
 void image_processor_test() {
     test_get_chunk();
+}
+
+int main() {
+    return 0;
 }

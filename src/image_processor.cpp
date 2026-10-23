@@ -149,32 +149,36 @@ void Image::greyscale(char &fmethod) {
     }
 }
 
-void Image::get_chunk() {
-    std::vector<std::vector<unsigned char>> current_chunk; // puts this bad boy into ram *gulp*
-
-    // w x h = 3840 x 2460
-    int gcd = std::gcd(_width, _height);
-    int chunk_width  = _width / gcd;
-    int chunk_height = _height / gcd;
-
-    /*
-    gets the first row of chunks
+/*
+This returns the row of chunks
+Ex.
+    Gets the first row of chunks
     for ex.
     -----------------
     | a | b | c | d |
     | e | f | g | h |
     ... continue until a x a ...
 
-    gets a, b, c, d
-    */
-    for (; _y < chunk_height; ++_y) {
-        _dst->read(reinterpret_cast<char*>(current_chunk[_y].data()), _width);
-        for (int i = 0; i < _y; ++i) {
-            for (int j = 0; i < _width; ++j) {
-                std::cout << "[" << i << "]" << "[" << j << "]" << (int)current_chunk[i][j] << std::endl;
-            }
-        }
+    returns a, b, c, d
+*/
+ std::vector<std::vector<unsigned char>> Image::get_chunk() {
+    // w x h = 3840 x 2460
+    _gcd = std::gcd(_width, _height);
+    _chunk_width  = _width / _gcd;  // calc chunk width 
+    _chunk_height = _height / _gcd; // calc a chunk height
+
+    // preallocates
+    std::vector<std::vector<unsigned char>> current_row_of_chunks(
+        _chunk_height,
+        std::vector<unsigned char>(_chunk_width)
+    ); // puts this bad boy into ram *gulp*
+
+    // reads from new bye stream and puts it into the first row of chunks
+    for (; _curr_chunk_height < _chunk_height; ++_curr_chunk_height) {
+        _dst->read(reinterpret_cast<char*>(current_row_of_chunks[_curr_chunk_height].data()), _width); 
     }
+
+    return current_row_of_chunks;
 }
 
 void Image::extract_finished_chunk() {
