@@ -1,0 +1,22 @@
+{
+    "name": "C/C++ (clang + cmake)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "llvm-vs-code-extensions.vscode-clangd",
+                "mas-vscode.cmake-tools"
+            ],
+            "settings": {
+                "cmake.configureSettings": {
+                    "CMAKE_C_COMPILER": "clang",
+                    "CMAKE_CXX_COMPILER": "clang++"
+                }
+            }
+        }
+    },
+    "postCreateCommand": "clang --version && cmake --version",
+    "remoteUser": "vscode"
+}
