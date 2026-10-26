@@ -67,6 +67,7 @@ class Image {
         long get_offset() { return _offset; };
 
         std::vector<std::vector<unsigned char>> get_chunk();
+        std::vector<std::vector<unsigned char>> get_chunk_row();
         void extract_finished_chunk();
 
         // strats

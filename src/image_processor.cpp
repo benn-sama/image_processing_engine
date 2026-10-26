@@ -185,14 +185,33 @@ void Image::extract_finished_chunk() {
 
 }
 
+// gets the vector[gcd][full_width]
+std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
+    _chunk_height = _height / _gcd;
+
+    // preallocate vector
+    std::vector<std::vector<unsigned char>> current_chunk_of_rows(
+        _chunk_height,
+        std::vector<unsigned char>(_chunk_width)
+    ); // puts whole whole rows up to x colu into ram gulp..
+
+    // puts whole the first chunk of rows into current_row_of_chunks
+    for (; _curr_chunk_height < _chunk_height; ++_curr_chunk_height) {
+        _dst->read(reinterpret_cast<char*>(current_chunk_of_rows[_curr_chunk_height].data()), _width);
+    }
+
+    return current_chunk_of_rows;
+}
+
 /*
 Strat A for multi-threading:
 
 - Put a x gcd(a, b) into ram
-- Loop over [gcd][gcd]
+- Loop over [gcd][full_width]
 - Multiple threads work under one chunk
-- When finished, calls a thread to extract the chunk into disc
-- Then, goes the next chunk
+- Each thread will have one/two rows to work with
+- When finished, calls a thread to extract the chunk into disc and deallocate chunk
+- Then, goes the next chunk and repeat
 
 */
 void Image::strat_A() {

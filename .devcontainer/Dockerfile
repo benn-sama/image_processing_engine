@@ -13,5 +13,5 @@ build-essential \
 && rm -rf /var/lib/apt/lists*
 
 # make clang the default cpp compiler in the terminal
-ENV CC=clang /
-CXX=clangd++
+ENV CC=clang \
+CXX=clang++
