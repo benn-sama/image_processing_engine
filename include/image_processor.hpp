@@ -81,6 +81,12 @@ class Image {
                 std::cout << (int)buffer[0] << std::endl;
             }
         }
+        
+        // temp for testing
+        std::vector<std::vector<unsigned char>> return_img();
+
+        // return gcd
+        int get_gcd() { return _gcd; };
 };
 
 #endif

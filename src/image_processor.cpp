@@ -161,25 +161,25 @@ Ex.
 
     returns a, b, c, d
 */
- std::vector<std::vector<unsigned char>> Image::get_chunk() {
-    // w x h = 3840 x 2460
-    _gcd = std::gcd(_width, _height);
-    _chunk_width  = _width / _gcd;  // calc chunk width 
-    _chunk_height = _height / _gcd; // calc a chunk height
+//  std::vector<std::vector<unsigned char>> Image::get_chunk() {
+//     // w x h = 3840 x 2460
+//     _gcd = std::gcd(_width, _height);
+//     _chunk_width  = _width / _gcd;  // calc chunk width 
+//     _chunk_height = _height / _gcd; // calc a chunk height
 
-    // preallocates
-    std::vector<std::vector<unsigned char>> current_row_of_chunks(
-        _chunk_height,
-        std::vector<unsigned char>(_chunk_width)
-    ); // puts this bad boy into ram *gulp*
+//     // preallocates
+//     std::vector<std::vector<unsigned char>> current_row_of_chunks(
+//         _chunk_height,
+//         std::vector<unsigned char>(_chunk_width)
+//     ); // puts this bad boy into ram *gulp*
 
-    // reads from new bye stream and puts it into the first row of chunks
-    for (; _curr_chunk_height < _chunk_height; ++_curr_chunk_height) {
-        _dst->read(reinterpret_cast<char*>(current_row_of_chunks[_curr_chunk_height].data()), _width); 
-    }
+//     // reads from new bye stream and puts it into the first row of chunks
+//     for (; _curr_chunk_height < _chunk_height; ++_curr_chunk_height) {
+//         _dst->read(reinterpret_cast<char*>(current_row_of_chunks[_curr_chunk_height].data()), _width); 
+//     }
 
-    return current_row_of_chunks;
-}
+//     return current_row_of_chunks;
+// }
 
 void Image::extract_finished_chunk() {
 
@@ -187,12 +187,13 @@ void Image::extract_finished_chunk() {
 
 // gets the vector[gcd][full_width]
 std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
+    _gcd = std::gcd(_width, _height);
     _chunk_height = _height / _gcd;
-
+    
     // preallocate vector
     std::vector<std::vector<unsigned char>> current_chunk_of_rows(
         _chunk_height,
-        std::vector<unsigned char>(_chunk_width)
+        std::vector<unsigned char>(_width)
     ); // puts whole whole rows up to x colu into ram gulp..
 
     // puts whole the first chunk of rows into current_row_of_chunks
@@ -216,6 +217,17 @@ Strat A for multi-threading:
 */
 void Image::strat_A() {
 
+}
+
+// returns whole image 
+std::vector<std::vector<unsigned char>> Image::return_img() {
+    std::vector<std::vector<unsigned char>> img;
+
+    for (int i; i < _height; ++i) {
+        _dst->read(reinterpret_cast<char*>(img[i].data()), _width);
+    }
+
+    return img;
 }
 
 
@@ -286,3 +298,4 @@ void Image::strat_A() {
 //         // std::cout << "count: " << count << std::endl;
 //     }
 // }
+

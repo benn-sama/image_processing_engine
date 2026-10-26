@@ -20,6 +20,8 @@ FetchContent_Declare(
 # this calls Catch2 that was declared previously, and adds the dependency in the build tree
 FetchContent_MakeAvailable(Catch2)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # adds source files to the build tree, this will be main
 add_executable(
     main 
@@ -54,7 +56,7 @@ add_executable(
 
 # where to search for those damn headers
 target_include_directories(tests PRIVATE include)
-target_link_directories(tests PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
 
 add_executable(
     image
@@ -72,4 +74,4 @@ add_executable(
 
 # where to search for those damn headers
 target_include_directories(image PRIVATE include)
-target_link_directories(image PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
+target_link_libraries(image PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
