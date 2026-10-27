@@ -54,6 +54,7 @@ class Image {
         void source(std::string &dir); // declare src directory
         void dest(std::string &dir);   // declare dest directory
         void clone();
+        void reset_ptr();
         /*
         l = luminosity
         a = avg

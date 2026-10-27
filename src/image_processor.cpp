@@ -237,6 +237,11 @@ std::vector<std::vector<unsigned char>> Image:: return_img() {
     return img;
 }
 
+// resets stream ptr to point back at the beginning of the first pixel
+void Image::reset_ptr() {
+    _dst->seekg(_offset, std::ios::beg);
+}
+
 
 // void Image::greyscale_adaptive() {
 //     // first checks if source exists
