@@ -20,6 +20,7 @@ FetchContent_Declare(
 # this calls Catch2 that was declared previously, and adds the dependency in the build tree
 FetchContent_MakeAvailable(Catch2)
 
+# this allows compiler to map the downloaded headers got from repo
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # adds source files to the build tree, this will be main

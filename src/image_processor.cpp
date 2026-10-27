@@ -201,6 +201,10 @@ std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
         _dst->read(reinterpret_cast<char*>(current_chunk_of_rows[_curr_chunk_height].data()), _width);
     }
 
+    // char* element;
+    // _dst->read(element, 1);
+    // std::cout << static_cast<int>(*element) << std::endl;
+
     return current_chunk_of_rows;
 }
 
@@ -220,10 +224,13 @@ void Image::strat_A() {
 }
 
 // returns whole image 
-std::vector<std::vector<unsigned char>> Image::return_img() {
-    std::vector<std::vector<unsigned char>> img;
+std::vector<std::vector<unsigned char>> Image:: return_img() {
+    std::vector<std::vector<unsigned char>> img(
+        _height,
+        std::vector<unsigned char>(_width)
+    );
 
-    for (int i; i < _height; ++i) {
+    for (int i = 0; i < _height; ++i) {
         _dst->read(reinterpret_cast<char*>(img[i].data()), _width);
     }
 
