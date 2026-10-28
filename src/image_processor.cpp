@@ -46,6 +46,8 @@ Image::Image(std::string dir) {
     this->source(dir);
 }
 
+Image::Image() {}
+
 void Image::source(std::string &dir) {
     _src = std::make_unique<std::fstream>(
         dir,
@@ -188,7 +190,7 @@ void Image::extract_finished_chunk() {
 // gets the vector[gcd][full_width]
 std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
     _gcd = std::gcd(_width, _height);
-    _chunk_height = _height / _gcd;
+    _chunk_height = 160;
     
     // preallocate vector
     std::vector<std::vector<unsigned char>> current_chunk_of_rows(
@@ -240,6 +242,13 @@ std::vector<std::vector<unsigned char>> Image:: return_img() {
 // resets stream ptr to point back at the beginning of the first pixel
 void Image::reset_ptr() {
     _dst->seekg(_offset, std::ios::beg);
+}
+
+// fills up the queue for workers
+void Image::fill_queue() {
+    for (; _curr_chunk_start < _curr_chunk_height; ++_curr_chunk_height) {
+        _row_queue.push(_curr_chunk_start);
+    }
 }
 
 

@@ -16,6 +16,7 @@
 #include <iostream>
 #include <filesystem>
 #include <memory>
+#include <queue>
 
 
 class Image {
@@ -39,10 +40,14 @@ class Image {
         int   _maxval  = 0;  // maxval of the image size of bits in one channel
        
         // these variables keep track of the chunks
-        intmax_t _curr_chunk_height = 0; // this tracks which row of chunk it's currently in. SHOULD NEVER GO ABOVE _height
-        int      _gcd             = 0;
-        int      _chunk_width     = 0;
-        int      _chunk_height    = 0;
+        intmax_t _curr_chunk_height         = 0; // this tracks which row of chunk it's currently in. SHOULD NEVER GO ABOVE _height
+        int      _curr_chunk_start          = 0;
+        int      _gcd                       = 0;
+        int      _chunk_width               = 0;
+        int      _chunk_height              = 0;
+
+        // queues for row
+        std::queue<unsigned char> _row_queue;
 
         // algorithms 
         long ppm_header_size(const std::filesystem::path& fileName);
@@ -51,6 +56,7 @@ class Image {
         ThreadPool thread_pool = ThreadPool(5);
     public:
         Image(std::string dir);
+        Image();
         void source(std::string &dir); // declare src directory
         void dest(std::string &dir);   // declare dest directory
         void clone();
@@ -66,6 +72,9 @@ class Image {
         int get_width()   { return _width;  }
         int get_height()  { return _height; }
         long get_offset() { return _offset; };
+
+        // testing
+        int get_queue_size() { return _row_queue.size(); };
 
         std::vector<std::vector<unsigned char>> get_chunk();
         std::vector<std::vector<unsigned char>> get_chunk_row();
@@ -88,6 +97,8 @@ class Image {
 
         // return gcd
         int get_gcd() { return _gcd; };
+
+        void fill_queue();
 };
 
 #endif
