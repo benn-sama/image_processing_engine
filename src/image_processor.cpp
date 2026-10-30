@@ -1,4 +1,5 @@
 #include "../include/image_processor.hpp"
+#include <mutex>
 
 /*
  * Returns the location of the ptr where header_size + 1
@@ -252,7 +253,25 @@ void Image::fill_queue() {
     }
 }
 
+int Image::get_next_row() {
+    {
+        std::lock_guard<std::mutex> lock(_mutx);
+        return ::pop_front(_row_queue);
+    }
+}
 
+void Image::gray_scale() {
+    int const NEXT_ROW = get_next_row();
+    gray_filter.sub(_currentChunk, _width, NEXT_ROW);
+}
+
+void Image::work() {
+    _currentChunk = get_chunk_row();
+
+    for (int i = _curr_chunk_start; i < _curr_chunk_height; ++i) {
+        thread_pool.add_queue([this] { gray_scale(); });
+    }
+}
 
 
 // void Image::greyscale_adaptive() {

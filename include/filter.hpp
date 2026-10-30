@@ -36,7 +36,7 @@ class Filter {
         Filter(size_t const channel, size_t const bit_depth);
         
         // algorithms for compressions specifically
-        int sub(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE);
+        int sub(std::vector<std::vector<unsigned char>>& filtersv, int const ARR_WIDTH, int const CURR_ROW);
         int up(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE);
         int avg(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE );
         int paeth(std::vector<unsigned char>& bottom, std::vector<unsigned char>& top, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE);

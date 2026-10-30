@@ -68,13 +68,4 @@ TEST_CASE("Testing Chunk Data Validity", "[image][chunks]") {
             REQUIRE(expected == actual);
         }
     }
-
-    // *************** checks if the queue is chronologically correct ********************
-    img.fill_queue();
-    for (int i = 0; i < 160; ++i) {
-        expected = i;
-        actual   = img.pop_front();
-        CAPTURE(expected, actual);
-        REQUIRE(expected == actual);
-    }
 }

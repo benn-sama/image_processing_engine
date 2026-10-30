@@ -1,5 +1,7 @@
 #include "../include/thread_pool.hpp"
 #include "../include/thread.hpp"
+#include <memory>
+#include <mutex>
 
 int total_working = 0;
 
@@ -10,10 +12,14 @@ ThreadPool::ThreadPool(short threadCount)
               << "Thread Count: " << threadCount << std::endl;
 
     for (int i = 0; i < THREAD_COUNT; ++i) {
-        pool.push_back(new Thread(i));
+        // pool.push_back(new Thread(i));
+        pool.push_back(std::make_unique<Thread>(i));
     }
     
     std::cout << "Threadpool initialized.\n";
+    std::cout << "Starting threads.\n";
+
+    this->startThreads();
 }
 
 void ThreadPool::startThreads() {
@@ -27,26 +33,39 @@ void ThreadPool::startThreads() {
 }
 
 void ThreadPool::run() {
-    this->startThreads();
-
     while (true) {
-        while (correctNumber()) {
-            std::unique_lock<std::mutex> lk(mutex);
-
-            if (total_working < 5) {
-                ++count;
-                ++total_working;
-                std::cout << count << ": Signaling thread.\n";
-
-                ready = 1; // this gives the thread a green light to go ahead
-                lk.unlock();
-                
-                cv.notify_one(); // this actually signals to the thread
-                std::cout << count << ": Thread signaled\n";
-            }
+        std::function<void()> task;
+        {
+            std::unique_lock<std::mutex> lck(mutex);
+            cv.wait(lck, [this] { return shut_off || !work_queue.size(); });
+            if (shut_off) { return; }
+            task = pop_front(work_queue);
         }
+        task(); // work the task
     }
 }
+
+// void ThreadPool::run() {
+//     this->startThreads();
+
+//     while (true) {
+//         while (correctNumber()) {
+//             std::unique_lock<std::mutex> lk(mutex);
+
+//             if (total_working < 5) {
+//                 ++count;
+//                 ++total_working;
+//                 std::cout << count << ": Signaling thread.\n";
+
+//                 ready = 1; // this gives the thread a green light to go ahead
+//                 lk.unlock();
+                
+//                 cv.notify_one(); // this actually signals to the thread
+//                 std::cout << count << ": Thread signaled\n";
+//             }
+//         }
+//     }
+// }
 
 /*
 What this does:
@@ -55,13 +74,8 @@ What this does:
 What are the jobs?
   These jobs are ints that represent each row up to the row_size of the photo
 */
-void ThreadPool::instantiate_work_queue(int const row_size) {
-    for (int i = 0; i < row_size; ++i) {
-        work_queue.push(i);
-    }
-
-    // a flag to show that work is available
-    is_work_available = true;
+void ThreadPool::add_queue(std::function<void ()> func) {
+    work_queue.push(func);
 }
 
 /*
@@ -76,4 +90,16 @@ int ThreadPool::clear_work_queue() {
     }
 
     return work_queue.size() > 0 ? 0 : 1;
+}
+
+/*
+What this does:
+  - Wakes up all threads
+  - Deallocates, then calls join
+*/
+void ThreadPool::shut_off_pool() {
+    cv.notify_all(); // wakey wakey all threads, time for school
+    for (auto& thread : pool) {
+        thread.reset();
+    }
 }

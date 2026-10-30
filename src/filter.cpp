@@ -34,18 +34,18 @@ n      = (channel * bit_depth) / 8
 This needs [i], [i - 1]
 */
 // just needs one row
-int Filter::sub(std::vector<unsigned char>& bottom, std::vector<std::vector<unsigned char>>& filtersv, int const ARR_SIZE) {
+int Filter::sub(std::vector<std::vector<unsigned char>>& filtersv, int const ARR_WIDTH, int const CURR_ROW) {
     int sum = 0;
     int sub = 0;
     
-    for (size_t i = 1; i < ARR_SIZE; ++i) {
-        int prev        = (i < _bpp) ? 0 : bottom[i - _bpp];
-        sub             = subf((int)bottom[i], prev);
+    for (size_t i = 1; i < ARR_WIDTH; ++i) {
+        int prev        = (i < _bpp) ? 0 : filtersv[CURR_ROW][i - _bpp];
+        sub             = subf((int)filtersv[CURR_ROW][i], prev);
         filtersv[1][i]  = sub;
         sum            += sub;
     }
 
-    return sum / ARR_SIZE;
+    return sum / ARR_WIDTH;
 }
 
 int Filter::upf(int const current_byte, int const prior) {
@@ -162,46 +162,46 @@ What it returns:
  NOTE:
     - ASSUME scanline is CURR_ARRAY_SIZE + 1. First byte notes which filter is being chosen for that scanline
 */
-int Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, const int ARR_SIZE) {
-    // preallocate 
-    int VEC_SIZE = ARR_SIZE + 1;
-    std::array<int, 5>         dumb_arr;
+// int Filter::filter_scanline(std::vector<unsigned char>& top, std::vector<unsigned char>& bottom, const int ARR_SIZE) {
+//     // preallocate 
+//     int VEC_SIZE = ARR_SIZE + 1;
+//     std::array<int, 5>         dumb_arr;
 
-    std::vector<std::vector<unsigned char>> filtersv(VEC_SIZE, std::vector<unsigned char>(5));
+//     std::vector<std::vector<unsigned char>> filtersv(VEC_SIZE, std::vector<unsigned char>(5));
 
-    filtersv[0][0] = 0;
-    filtersv[1][0] = 1;
-    filtersv[2][0] = 2;
-    filtersv[3][0] = 3;
-    filtersv[4][0] = 4;
+//     filtersv[0][0] = 0;
+//     filtersv[1][0] = 1;
+//     filtersv[2][0] = 2;
+//     filtersv[3][0] = 3;
+//     filtersv[4][0] = 4;
 
-    /*
-    1. subf
-    2. upf
-    3. avgf
-    4. paethf
-    */
-    dumb_arr[0] = none(bottom, filtersv, ARR_SIZE);
-    dumb_arr[1] = sub(bottom, filtersv, ARR_SIZE);
-    dumb_arr[2] = up(bottom, top, filtersv, ARR_SIZE);
-    dumb_arr[3] = avg(bottom, top, filtersv, ARR_SIZE);
-    dumb_arr[4] = paeth(bottom, top, filtersv, ARR_SIZE);
+//     /*
+//     1. subf
+//     2. upf
+//     3. avgf
+//     4. paethf
+//     */
+//     dumb_arr[0] = none(bottom, filtersv, ARR_SIZE);
+//     dumb_arr[1] = sub(bottom, filtersv, ARR_SIZE);
+//     dumb_arr[2] = up(bottom, top, filtersv, ARR_SIZE);
+//     dumb_arr[3] = avg(bottom, top, filtersv, ARR_SIZE);
+//     dumb_arr[4] = paeth(bottom, top, filtersv, ARR_SIZE);
 
-    std::cout << "none:   " << dumb_arr[0] << std::endl
-              << "sub:    " << dumb_arr[1] << std::endl
-              << "up:     " << dumb_arr[2] << std::endl
-              << "avg:    " << dumb_arr[3] << std::endl
-              << "paeth:  " << dumb_arr[4] << std::endl;
+//     std::cout << "none:   " << dumb_arr[0] << std::endl
+//               << "sub:    " << dumb_arr[1] << std::endl
+//               << "up:     " << dumb_arr[2] << std::endl
+//               << "avg:    " << dumb_arr[3] << std::endl
+//               << "paeth:  " << dumb_arr[4] << std::endl;
 
-    // chooses which scanline has the least sum 
-    int least = dumb_arr[0];
-    int pos   = 0;
-    for (int i = 1; i < 5; ++i) {
-        if (least > dumb_arr[i]) {
-            least = dumb_arr[i];
-            pos = i;
-        }
-    }
+//     // chooses which scanline has the least sum 
+//     int least = dumb_arr[0];
+//     int pos   = 0;
+//     for (int i = 1; i < 5; ++i) {
+//         if (least > dumb_arr[i]) {
+//             least = dumb_arr[i];
+//             pos = i;
+//         }
+//     }
 
-    return least;
-}
+//     return least;
+// }

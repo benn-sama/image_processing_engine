@@ -34,7 +34,7 @@ class Image {
         std::string                   _dstName   = "";       // dir of dest
         bool                          _modifystr = false;
         bool                          _isValid   = true;
-        std::vector<unsigned char>    _currentChunk;
+        std::vector<std::vector<unsigned char>>    _currentChunk;
         
         // greyscale related
         Greyscale greyf;
@@ -52,6 +52,8 @@ class Image {
         int      _gcd                       = 0;
         int      _chunk_width               = 0;
         int      _chunk_height              = 0;
+
+        std::mutex _mutx;
 
         // queues for row
         std::queue<unsigned char> _row_queue;
@@ -87,6 +89,10 @@ class Image {
         std::vector<std::vector<unsigned char>> get_chunk();
         std::vector<std::vector<unsigned char>> get_chunk_row();
         void extract_finished_chunk();
+        void gray_scale();
+        int get_next_row();
+
+        void work();
 
         // strats
         void strat_A();
