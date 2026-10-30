@@ -190,7 +190,7 @@ void Image::extract_finished_chunk() {
 // gets the vector[gcd][full_width]
 std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
     _gcd = std::gcd(_width, _height);
-    _chunk_height = 160;
+    _chunk_height = 160; // temporary, this needs to be dynamic
     
     // preallocate vector
     std::vector<std::vector<unsigned char>> current_chunk_of_rows(
@@ -246,10 +246,13 @@ void Image::reset_ptr() {
 
 // fills up the queue for workers
 void Image::fill_queue() {
-    for (; _curr_chunk_start < _curr_chunk_height; ++_curr_chunk_height) {
+
+    for (; _curr_chunk_start < _curr_chunk_height; ++_curr_chunk_start) {
         _row_queue.push(_curr_chunk_start);
     }
 }
+
+
 
 
 // void Image::greyscale_adaptive() {

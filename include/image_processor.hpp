@@ -18,6 +18,13 @@
 #include <memory>
 #include <queue>
 
+// when .pop is called, also return 
+template <typename T>
+T pop_front(std::queue<T>& q) {
+    T value = std::move(q.front());
+    q.pop();
+    return value;
+}
 
 class Image {
     private:
@@ -75,6 +82,7 @@ class Image {
 
         // testing
         int get_queue_size() { return _row_queue.size(); };
+        int pop_front() { return ::pop_front(_row_queue); };
 
         std::vector<std::vector<unsigned char>> get_chunk();
         std::vector<std::vector<unsigned char>> get_chunk_row();

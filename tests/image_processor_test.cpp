@@ -5,7 +5,7 @@
 
 // global variables
 
-TEST_CASE("Testing Chunk Validity", "[image][chunks]") {
+TEST_CASE("Testing Chunk Data Validity", "[image][chunks]") {
     std::string src;
     Image       img;
     std::string dst1;
@@ -67,5 +67,14 @@ TEST_CASE("Testing Chunk Validity", "[image][chunks]") {
             CAPTURE(expected, actual);
             REQUIRE(expected == actual);
         }
+    }
+
+    // *************** checks if the queue is chronologically correct ********************
+    img.fill_queue();
+    for (int i = 0; i < 160; ++i) {
+        expected = i;
+        actual   = img.pop_front();
+        CAPTURE(expected, actual);
+        REQUIRE(expected == actual);
     }
 }
