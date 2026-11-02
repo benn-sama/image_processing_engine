@@ -39,7 +39,7 @@ void ThreadPool::run() {
             std::unique_lock<std::mutex> lck(mutex);
             cv.wait(lck, [this] { return shut_off || !work_queue.size(); });
             if (shut_off) { return; }
-            task = pop_front(work_queue);
+            task = ::pop_front(work_queue);
         }
         task(); // work the task
     }
@@ -74,7 +74,7 @@ What this does:
 What are the jobs?
   These jobs are ints that represent each row up to the row_size of the photo
 */
-void ThreadPool::add_queue(std::function<void ()> func) {
+void ThreadPool::add_queue(std::function<void()> func) {
     work_queue.push(func);
 }
 

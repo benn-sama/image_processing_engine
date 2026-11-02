@@ -274,6 +274,8 @@ void Image::work() {
 }
 
 
+
+
 // void Image::greyscale_adaptive() {
 //     // first checks if source exists
 //     if (_src == nullptr) {

@@ -62,6 +62,7 @@ target_link_libraries(tests PRIVATE Catch2::Catch2WithMain) # also include the t
 add_executable(
     image
     tests/image_processor_test.cpp
+    tests/thread_pool_test.cpp
     src/filter.cpp
     src/greyscale.cpp
     src/huffman.cpp

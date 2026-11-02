@@ -1,7 +1,6 @@
 #ifndef THREAD_POOL_HPP
 #define THREAD_POOL_HPP
 
-#include "image_processor.hpp"
 #include "thread.hpp"
 
 #include <functional>
@@ -12,9 +11,9 @@
 #include <queue>
 
 template <typename T>
-T pop_front(std::queue<std::function<T>> func) {
-    T value = std::move(func.front());
-    func.pop();
+auto pop_front(T& q) {
+    auto value = std::move(q.front());
+    q.pop();
     return value;
 }
 
@@ -37,8 +36,8 @@ class ThreadPool{
         void add_queue(std::function<void()> func);
         void run();                                // threads start running here
         void shut_off_pool();
-        int clear_work_queue();
-        int get_work_count() { return work_queue.size(); }
+        int  clear_work_queue();
+        int  get_work_count() { return work_queue.size(); }
 };
 
 #endif
