@@ -10,78 +10,6 @@ int randomTime() {
     return random.getRandomNum(1000, 5000);
 }
 
-/*
- Method: 
-   Constructor
- 
- Desc:
-   This constructor assings an id to this instance
-*/
-Thread::Thread(uint16_t id) {
-    this->id = id;
-}
-
-/*
- Method: 
-   doWork()
-
- Desc:
-   This method allows the thread to simulate "work"
-*/
-
-void Thread::doWork(std::mutex& mutex, std::condition_variable& cv, int& ready) {
-    using namespace std::literals::chrono_literals;
-    RandomNum random;
-
-    while (true) { // this needs to end when all tasks are done
-      {
-        std::unique_lock<std::mutex> lk(mutex);
-        std::cout << id << ": Hello!" << std::endl;
-        // -- THREAD WAITS HERE
-        cv.wait(lk, [&ready] { return ready > 0; });
-
-        std::cout << id << ": wokeup\n";
-        std::cout << id << ": working...\n";
-        
-        // reset ready
-        ready = 0;
-      }
-      
-      // this here is the actual work for the thread
-      std::this_thread::sleep_for(std::chrono::milliseconds(random.getRandomNum(1000, 10000)));
-      std::cout << id << ": done!\n";
-      std::cout << id << ": going back to sleep.\n";
-    
-      {
-        std::unique_lock<std::mutex> lk(mutex);
-        --total_working;
-      }
-
-    }
-}
-
-void Thread::greyscale(std::mutex& mutex, std::condition_variable& cv, int& ready, std::vector<std::vector<unsigned char>>& photo, std::stack<unsigned int>& work_queue, std::stack<unsigned int>& remaining_work_queue, bool& is_work_available) {
-    while (is_work_available) { // this needs to end when all tasks are done
-      {
-        // -- THREAD WAITS HERE  
-        std::unique_lock<std::mutex> lk(mutex);
-
-        // -- THREAD ALSO WAITS HERE (only if spurious wake ups)
-        cv.wait(lk, [&ready] { return ready > 0; });
-        work_queue.pop();
-        // reset ready
-        ready = 0;
-      }
-      
-      // this here is the actual work for the thread
-    
-      {
-        std::unique_lock<std::mutex> lk(mutex);
-        --total_working;
-      }
-
-    }
-}
 
 /*
  Method: 
@@ -99,27 +27,10 @@ uint16_t Thread::getID() {
    run()
 
  Desc:
-   Creates instance of thread and pass this instance as the parameter
+   Creates instance of thread and passes a function as the parameter and points to it
 */
-void Thread::run(std::mutex& mutex, std::condition_variable& cv, int& ready) {
-    // _thread = new std::thread(workerThread, this, std::ref(sem));
-    _thread = std::make_unique<std::thread>(
-      &Thread::workerThread, 
-      this, 
-      std::ref(mutex), 
-      std::ref(cv), 
-      std::ref(ready));
-}
-
-/*
- Method: 
-   workerThread(Thread* thread)
-
- Desc:
-   This calls the do work function
-*/
-void Thread::workerThread(Thread* aThread, std::mutex& mutex, std::condition_variable& cv, int& ready) {
-  aThread->doWork(mutex, cv, ready);
+void Thread::run(std::function<void()> func) {
+  _thread = std::thread(std::move(func));
 }
 
 /*
@@ -130,7 +41,5 @@ void Thread::workerThread(Thread* aThread, std::mutex& mutex, std::condition_var
   This method calls the main process to wait until this thread is terminated
 */
 void Thread::wait() {
-  if (_thread && _thread->joinable()) {
-    _thread->join();
-  }
+  if (_thread.joinable()) { _thread.join(); }
 }

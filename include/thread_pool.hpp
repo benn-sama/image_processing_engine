@@ -29,15 +29,13 @@ class ThreadPool{
 
         // this will definitely be the shared resource
         std::queue<std::function<void()>> work_queue; // task queue 
-        void                     startThreads();      // starts the threads
-        std::atomic<bool>        is_work_available = false;
     public:
         ThreadPool(short threadCount);             // constructor that initializes the number of threads
         void add_queue(std::function<void()> func);
-        void run();                                // threads start running here
         void shut_off_pool();
         int  clear_work_queue();
         int  get_work_count() { return work_queue.size(); }
+        void workerLoop(int id);
 };
 
 #endif
