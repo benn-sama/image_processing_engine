@@ -37,7 +37,7 @@ class Thread {
         std::thread _thread;
         
     public:
-        Thread(int id) : id(id) {};
+        Thread(int id) : id(id) { std::cout << '[' << id << ']' << "im alive" << std::endl;};
 
         // prevents/deletes the copy constructor
         Thread(Thread&&) noexcept            = default; // promises the caller it will not throw

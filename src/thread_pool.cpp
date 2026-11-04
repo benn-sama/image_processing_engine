@@ -1,5 +1,6 @@
 #include "../include/thread_pool.hpp"
 #include "../include/thread.hpp"
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -28,11 +29,15 @@ void ThreadPool::workerLoop(int i) {
         task();
     }
 
-    shut_off_pool();
+    
 }
 
 void ThreadPool::add_queue(std::function<void()> func) {
-    work_queue.push(func);
+    {
+        std::lock_guard<std::mutex> lck(mutex);
+        work_queue.push(func);
+    }
+    cv.notify_one();
 }
 
 /*
@@ -55,9 +60,14 @@ What this does:
   - Deallocates, then calls join
 */
 void ThreadPool::shut_off_pool() {
+    {
+        std::lock_guard<std::mutex> lck(mutex);
+        shut_off = true;
+    }
+
     cv.notify_all(); // wakey wakey all threads, time for school
     for (auto& thread : pool) {
+        thread->wait();
         thread.reset();
     }
 }
-

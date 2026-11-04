@@ -39,4 +39,6 @@ TEST_CASE("Testing Thread Pool", "[thread]") {
 
     CAPTURE(expected, actual);
     REQUIRE(expected == actual);
+
+    pool.shut_off_pool();
 }

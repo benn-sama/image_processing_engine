@@ -77,3 +77,21 @@ add_executable(
 # where to search for those damn headers
 target_include_directories(image PRIVATE include)
 target_link_libraries(image PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
+
+add_executable(
+    thread
+    tests/thread_pool_test.cpp
+    src/filter.cpp
+    src/greyscale.cpp
+    src/huffman.cpp
+    src/image_processor.cpp
+    src/lz77.cpp
+    src/pngt.cpp
+    src/random_num_gen.cpp
+    src/thread_pool.cpp
+    src/thread.cpp
+)
+
+# where to search for those damn headers
+target_include_directories(thread PRIVATE include)
+target_link_libraries(thread PRIVATE Catch2::Catch2WithMain) # also include the test dependencies

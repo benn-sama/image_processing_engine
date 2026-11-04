@@ -5,12 +5,6 @@
 #include <memory>
 #include <mutex>
 
-int randomTime() {
-    RandomNum random;
-    return random.getRandomNum(1000, 5000);
-}
-
-
 /*
  Method: 
    getID()
