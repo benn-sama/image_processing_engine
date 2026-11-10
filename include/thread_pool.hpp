@@ -36,6 +36,7 @@ class ThreadPool{
         int  clear_work_queue();
         int  get_work_count() { return work_queue.size(); }
         void workerLoop(int id);
+        // ~ThreadPool();
 };
 
 #endif

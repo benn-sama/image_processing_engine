@@ -37,7 +37,7 @@ class Thread {
         std::thread _thread;
         
     public:
-        Thread(int id) : id(id) { std::cout << '[' << id << ']' << "im alive" << std::endl;};
+        Thread(int id) : id(id) {} 
 
         // prevents/deletes the copy constructor
         Thread(Thread&&) noexcept            = default; // promises the caller it will not throw
@@ -47,7 +47,7 @@ class Thread {
 
         void run(std::function<void()> func); // passes the function to work on and points towards it
         void wait(); // join the main thread
-
+        ~Thread();
 
         u_int16_t getID();
 };
