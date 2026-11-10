@@ -1,97 +1,65 @@
 cmake_minimum_required(VERSION 3.20)
-project(image_processing_engine)
+project(image_processing_engine CXX)
 
-# this tells cmake to use c++20
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)   # fail instead of silently falling back to an older standard
+set(CMAKE_CXX_EXTENSIONS OFF)         # -std=c++20 
 
-# this prevents compilation from silently reverting to an old version of c__ 
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# this includes the Fetch Module 
-include(FetchContent) 
-
-# this calls the git repo before compiling
-FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.11.0
-)
-
-# this calls Catch2 that was declared previously, and adds the dependency in the build tree
-FetchContent_MakeAvailable(Catch2)
-
-# this allows compiler to map the downloaded headers got from repo
+# Writes compile_commands.json to the build dir so clangd / clang-tidy / IDEs
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# adds source files to the build tree, this will be main
-add_executable(
-    main 
-    src/main.cpp 
-    src/filter.cpp
-    src/greyscale.cpp
-    src/huffman.cpp
-    src/image_processor.cpp
-    src/lz77.cpp
-    src/pngt.cpp
-    src/random_num_gen.cpp
-    src/thread_pool.cpp
-    src/thread.cpp
+# ---- Sanitizers -------------------------------------------------------------
+# Defined BEFORE FetchContent so dependencies get instrumented as well
+option(ENABLE_TSAN "Build with ThreadSanitizer" OFF)
+if(ENABLE_TSAN)
+  add_compile_options(-fsanitize=thread -g -O1 -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=thread)
+endif()
+
+# ---- Dependencies -----------------------------------------------------------
+include(FetchContent)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.11.0
 )
+FetchContent_MakeAvailable(Catch2)
 
-# redirects the tests on where to find proj headers
-target_include_directories(main PRIVATE include)
+find_package(Threads REQUIRED)
 
-add_executable(
-    tests
-    src/main.cpp 
-    src/filter.cpp
-    src/greyscale.cpp
-    src/huffman.cpp
-    src/image_processor.cpp
-    src/lz77.cpp
-    src/pngt.cpp
-    src/random_num_gen.cpp
-    src/thread_pool.cpp
-    src/thread.cpp
+# ---- Engine library: compiled once, shared by the app and the tests --------
+add_library(engine STATIC
+  src/filter.cpp
+  src/greyscale.cpp
+  src/huffman.cpp
+  src/image_processor.cpp
+  src/lz77.cpp
+  src/pngt.cpp
+  src/random_num_gen.cpp
+  src/thread_pool.cpp
+  src/thread.cpp
 )
+# PUBLIC = anything linking `engine` automatically gets these headers and pthreads
+target_include_directories(engine PUBLIC include)
+target_link_libraries(engine PUBLIC Threads::Threads)
 
-# where to search for those damn headers
-target_include_directories(tests PRIVATE include)
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
+# ---- Application ------------------------------------------------------------
+add_executable(main src/main.cpp)
+target_link_libraries(main PRIVATE engine)
 
-add_executable(
-    image
-    tests/image_processor_test.cpp
-    tests/thread_pool_test.cpp
-    src/filter.cpp
-    src/greyscale.cpp
-    src/huffman.cpp
-    src/image_processor.cpp
-    src/lz77.cpp
-    src/pngt.cpp
-    src/random_num_gen.cpp
-    src/thread_pool.cpp
-    src/thread.cpp
+# ---- Tests ------------------------------------------------------------------
+# No src/main.cpp here: Catch2WithMain provides main().
+add_executable(tests
+  tests/image_processor_test.cpp
+  tests/thread_pool_test.cpp
 )
+target_link_libraries(tests PRIVATE engine Catch2::Catch2WithMain)
 
-# where to search for those damn headers
-target_include_directories(image PRIVATE include)
-target_link_libraries(image PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
-
-add_executable(
-    thread
-    tests/thread_pool_test.cpp
-    src/filter.cpp
-    src/greyscale.cpp
-    src/huffman.cpp
-    src/image_processor.cpp
-    src/lz77.cpp
-    src/pngt.cpp
-    src/random_num_gen.cpp
-    src/thread_pool.cpp
-    src/thread.cpp
+enable_testing()
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)   # needed for include(Catch) with FetchContent
+include(Catch)
+catch_discover_tests(tests
+  PROPERTIES
+    TIMEOUT 60   # kill hung tests (e.g. deadlocked thread pool)
+    ENVIRONMENT "TSAN_OPTIONS=halt_on_error=1:second_deadlock_stack=1"
 )
-
-# where to search for those damn headers
-target_include_directories(thread PRIVATE include)
-target_link_libraries(thread PRIVATE Catch2::Catch2WithMain) # also include the test dependencies
