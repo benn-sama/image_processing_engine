@@ -70,19 +70,10 @@ void ThreadPool::shut_off_pool() {
     }
 }
 
-// // /*
-// // What this does:
-// //   - Calls the shut_off_pool when out of scope
-// // */
-// ThreadPool::~ThreadPool() {
-//     {
-//         std::lock_guard<std::mutex> lck(mutex);
-//         shut_off = true;
-//     }
-
-//     cv.notify_all(); // wakey wakey all threads, time for school
-//     for (auto& thread : pool) {
-//         thread->wait();
-//         thread.reset();
-//     }
-// }
+// /*
+// What this does:
+//   - Calls the shut_off_pool when out of scope
+// */
+ThreadPool::~ThreadPool() {
+    this->shut_off_pool();
+}

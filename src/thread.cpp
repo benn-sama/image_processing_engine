@@ -38,6 +38,6 @@ void Thread::wait() {
   if (_thread.joinable()) { _thread.join(); }
 }
 
-Thread::~Thread() {
-  if (_thread.joinable()) { _thread.join(); }
-}
+// Thread::~Thread() {
+//   if (_thread.joinable()) { _thread.join(); }
+// }

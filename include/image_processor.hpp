@@ -32,10 +32,11 @@ class Image {
         Filter    gray_filter; //
 
         // anything image header related
-        long  _offset  = 0;  // size of the src header
-        int   _width   = 0;  // width of the image
-        int   _height  = 0;  // width of the image
-        int   _maxval  = 0;  // maxval of the image size of bits in one channel
+        long  _offset   = 0;  // size of the src header
+        int   _width    = 0;  // width of the image
+        int   _height   = 0;  // width of the image
+        int   _maxval   = 0;  // maxval of the image size of bits in one channel
+        int   _temp_ptr = 0;
        
         // these variables keep track of the chunks
         intmax_t _curr_chunk_height         = 0; // this tracks which row of chunk it's currently in. SHOULD NEVER GO ABOVE _height
@@ -54,9 +55,11 @@ class Image {
 
         // thread pool for work
         ThreadPool thread_pool = ThreadPool(5);
+        short        _num_of_threads = 0;
     public:
         Image(std::string dir);
         Image();
+
         void source(std::string &dir); // declare src directory
         void dest(std::string &dir);   // declare dest directory
         void clone();

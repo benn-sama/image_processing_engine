@@ -20,7 +20,7 @@ auto pop_front(T& q) {
 class ThreadPool{
     private:
         std::vector<std::unique_ptr<Thread>>    pool;
-        const short             THREAD_COUNT;      // total thread count
+        short                   THREAD_COUNT = 5;      // total thread count
         int                     count = 0;         // total times a thread has been signaled
         std::mutex              mutex;             // protect resources
         std::condition_variable cv;                // for signaling
@@ -36,7 +36,7 @@ class ThreadPool{
         int  clear_work_queue();
         int  get_work_count() { return work_queue.size(); }
         void workerLoop(int id);
-        // ~ThreadPool();
+        ~ThreadPool();
 };
 
 #endif

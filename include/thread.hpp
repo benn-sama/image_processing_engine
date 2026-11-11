@@ -47,7 +47,7 @@ class Thread {
 
         void run(std::function<void()> func); // passes the function to work on and points towards it
         void wait(); // join the main thread
-        ~Thread();
+        // ~Thread();
 
         u_int16_t getID();
 };

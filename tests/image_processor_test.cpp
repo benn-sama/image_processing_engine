@@ -15,6 +15,7 @@ TEST_CASE("Testing Chunk Data Validity", "[image][chunks]") {
     dst1 = "photos/1080_test";
     dst2 = "photos/1080_testt";
 
+    std::cout << "here";
     img.source(src) ;
     img.dest(dst1);
     img.clone();

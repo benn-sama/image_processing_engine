@@ -8,6 +8,8 @@
 #include <stack>
 #include <thread>
 
+inline static std::mutex global_mtx;
+
 // returns top of stack and removes top value
 template <typename  T>
 T draw(std::stack<T>& s) {
@@ -25,9 +27,7 @@ void init_stack(std::stack<int>& stack, int size) {
 
 // prints the top of the stack
 void draw_stack(std::stack<int>& stack) {
-    static std::mutex mtx;
-    
-    std::lock_guard<std::mutex> lck(mtx);
+    std::lock_guard<std::mutex> lck(global_mtx);
     int num = ::draw(stack);
 }
 
@@ -54,8 +54,13 @@ TEST_CASE("Testing Thread Pool", "[thread]") {
     }
 
     expected = 0;
-    while (actual != 0) {
-        actual = stack_of_nums.size();
+
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lck(global_mtx);
+            actual = stack_of_nums.size();
+            if (actual != 0) return;
+        }
     }
 
     CAPTURE(expected, actual);
