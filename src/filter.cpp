@@ -11,7 +11,7 @@
 #include <vector>
 #include <limits>
 
-Filter::Filter(size_t const channel, size_t const bit_depth) {
+Filter::Filter(size_t const channel, size_t bit_depth) {
    _bpp = (channel * bit_depth) / 8; 
 }
 
@@ -41,7 +41,7 @@ int Filter::sub(std::vector<std::vector<unsigned char>>& filtersv, int const ARR
     for (size_t i = 1; i < ARR_WIDTH; ++i) {
         int prev        = (i < _bpp) ? 0 : filtersv[CURR_ROW][i - _bpp];
         sub             = subf((int)filtersv[CURR_ROW][i], prev);
-        filtersv[1][i]  = sub;
+        filtersv[CURR_ROW][i]  = sub;
         sum            += sub;
     }
 

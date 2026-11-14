@@ -191,17 +191,18 @@ void Image::extract_finished_chunk() {
 // gets the vector[gcd][full_width]
 std::vector<std::vector<unsigned char>> Image::get_chunk_row() {
     _gcd = std::gcd(_width, _height);
-    _chunk_height = 160; // temporary, this needs to be dynamic
+    _chunk_height = 3; // temporary, this needs to be dynamic
+    _chunk_width  = _width * 3;
     
     // preallocate vector
     std::vector<std::vector<unsigned char>> current_chunk_of_rows(
         _chunk_height,
-        std::vector<unsigned char>(_width)
+        std::vector<unsigned char>(_chunk_width)
     ); // puts whole whole rows up to x colu into ram gulp..
 
     // puts whole the first chunk of rows into current_row_of_chunks
     for (; _curr_chunk_height < _chunk_height; ++_curr_chunk_height) {
-        _dst->read(reinterpret_cast<char*>(current_chunk_of_rows[_curr_chunk_height].data()), _width);
+        _dst->read(reinterpret_cast<char*>(current_chunk_of_rows[_curr_chunk_height].data()), _chunk_width);
     }
 
     // char* element;
@@ -223,11 +224,19 @@ Strat A for multi-threading:
 
 */
 void Image::strat_A() {
+    std::string src = "photos/3x30_test.ppm";
+    std::string dst1 = "photos/3_x_30_testing.ppm";
+    source(src) ;
+    dest(dst1);
+    clone();
 
+    _currentChunk = get_chunk_row();
+    fill_queue();
+    single_work();
 }
 
 // returns whole image 
-std::vector<std::vector<unsigned char>> Image:: return_img() {
+std::vector<std::vector<unsigned char>> Image::return_img() {
     std::vector<std::vector<unsigned char>> img(
         _height,
         std::vector<unsigned char>(_width)
@@ -238,6 +247,11 @@ std::vector<std::vector<unsigned char>> Image:: return_img() {
     }
 
     return img;
+}
+
+// returns whole image 
+std::vector<std::vector<unsigned char>> Image::return_whole_chunk() {
+    return _currentChunk;
 }
 
 // resets stream ptr to point back at the beginning of the first pixel
@@ -262,14 +276,27 @@ int Image::get_next_row() {
 
 void Image::gray_scale() {
     int const NEXT_ROW = get_next_row();
-    gray_filter.sub(_currentChunk, _width, NEXT_ROW);
+    for (int j = 0; j < _chunk_width; j += 3) {
+        unsigned char& red   = _currentChunk[NEXT_ROW][j];
+        unsigned char& green = _currentChunk[NEXT_ROW][j + 1];
+        unsigned char& blue  = _currentChunk[NEXT_ROW][j + 2];
+
+        unsigned char const gray_value = greyf.luminosityf(red, green, blue);
+        red   = gray_value;
+        green = gray_value;
+        blue  = gray_value;
+    }
 }
 
 void Image::work() {
-    _currentChunk = get_chunk_row();
-
     for (int i = _curr_chunk_start; i < _curr_chunk_height; ++i) {
         thread_pool.add_queue([this] { gray_scale(); });
+    }
+}
+
+void Image::single_work() {
+    for (int i = 0; i < _curr_chunk_height; ++i) {
+        gray_scale();
     }
 }
 

@@ -25,20 +25,22 @@ class Image {
         std::string                   _dstName   = "";       // dir of dest
         bool                          _modifystr = false;
         bool                          _isValid   = true;
-        std::vector<std::vector<unsigned char>>    _currentChunk;
         
         // greyscale related
         Greyscale greyf;
+        
+        // compression related lol
         Filter    gray_filter; //
-
+        
         // anything image header related
         long  _offset   = 0;  // size of the src header
         int   _width    = 0;  // width of the image
         int   _height   = 0;  // width of the image
         int   _maxval   = 0;  // maxval of the image size of bits in one channel
         int   _temp_ptr = 0;
-       
+        
         // these variables keep track of the chunks
+        std::vector<std::vector<unsigned char>> _currentChunk;
         intmax_t _curr_chunk_height         = 0; // this tracks which row of chunk it's currently in. SHOULD NEVER GO ABOVE _height
         int      _curr_chunk_start          = 0;
         int      _gcd                       = 0;
@@ -87,6 +89,7 @@ class Image {
         int get_next_row();
 
         void work();
+        void single_work();
 
         // strats
         void strat_A();
@@ -102,6 +105,7 @@ class Image {
         
         // temp for testing
         std::vector<std::vector<unsigned char>> return_img();
+        std::vector<std::vector<unsigned char>> return_whole_chunk();
 
         // return gcd
         int get_gcd() { return _gcd; };

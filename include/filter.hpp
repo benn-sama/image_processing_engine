@@ -33,7 +33,7 @@ class Filter {
         
         public:
         Filter() {};
-        Filter(size_t const channel, size_t const bit_depth);
+        Filter(size_t const channel, size_t bit_depth);
         
         // algorithms for compressions specifically
         int sub(std::vector<std::vector<unsigned char>>& filtersv, int const ARR_WIDTH, int const CURR_ROW);
